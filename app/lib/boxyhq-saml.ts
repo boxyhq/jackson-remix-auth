@@ -30,9 +30,28 @@ export interface BoxyHQSAMLProfile extends OAuth2Profile {
   lastName?: string;
 }
 
-// And we create our strategy extending the OAuth2Strategy, we also need to
-// pass the User as we did on the FormStrategy, we pass the Auth0Profile and the
-// extra params
+/**
+ * `BoxyHQSAMLStrategy` extends the `OAuth2Strategy`.We need to
+ * pass the User, BoxyHQSAMLProfile and the
+ * extra params for generics
+ * @example
+ * export const auth = new Authenticator<BoxyHQSAMLProfile>(sessionStorage);
+ *  auth.use(
+ *    new BoxyHQSAMLStrategy(
+ *      {
+ *        issuer: process.env.BOXYHQSAML_ISSUER!,
+ *        clientID: "dummy", // The dummy here is necessary since we'll pass tenant and product custom attributes in `AuthenticateOptions.context`
+ *        clientSecret: "dummy", // The dummy here is necessary since we'll pass tenant and product custom attributes in `AuthenticateOptions.context`
+ *        callbackURL: new URL("/auth/saml/callback", BASE_URL).toString(),
+ *      },
+ *      // eslint-disable-next-line no-empty-pattern
+ *      async ({ profile }) => {
+ *        return profile;
+ *      }
+ *    )
+ *  );
+ */
+
 export class BoxyHQSAMLStrategy<User> extends OAuth2Strategy<
   User,
   BoxyHQSAMLProfile,
