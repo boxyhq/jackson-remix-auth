@@ -10,7 +10,7 @@ import { OAuth2Strategy } from "remix-auth-oauth2";
 
 // These are the custom options we need from the developer to use the strategy
 export interface BoxyHQSAMLStrategyOptions {
-  domain: string;
+  issuer: string;
   clientID: string;
   clientSecret: string;
   callbackURL: string;
@@ -63,8 +63,8 @@ export class BoxyHQSAMLStrategy<User> extends OAuth2Strategy<
     // using our strategy
     super(
       {
-        authorizationURL: `${options.domain}/api/oauth/authorize`,
-        tokenURL: `${options.domain}/api/oauth/token`,
+        authorizationURL: `${options.issuer}/api/oauth/authorize`,
+        tokenURL: `${options.issuer}/api/oauth/token`,
         clientID: "dummy",
         clientSecret: "dummy",
         callbackURL: options.callbackURL,
@@ -72,7 +72,7 @@ export class BoxyHQSAMLStrategy<User> extends OAuth2Strategy<
       verify
     );
 
-    this.userInfoURL = `${options.domain}/api/oauth/userinfo`;
+    this.userInfoURL = `${options.issuer}/api/oauth/userinfo`;
   }
 
   async authenticate(

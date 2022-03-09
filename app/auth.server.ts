@@ -6,8 +6,8 @@ if (!process.env.BASE_URL) {
   throw new Error("BASE_URL is required");
 }
 
-if (!process.env.JACKSON_SERVICE) {
-  throw new Error("JACKSON_SERVICE is required");
+if (!process.env.BOXYHQSAML_ISSUER) {
+  throw new Error("BOXYHQSAML_ISSUER is required");
 }
 
 const BASE_URL = process.env.BASE_URL;
@@ -28,7 +28,7 @@ export const auth = new Authenticator<BoxyHQSAMLProfile>(sessionStorage);
 auth.use(
   new BoxyHQSAMLStrategy(
     {
-      domain: process.env.JACKSON_SERVICE!,
+      issuer: process.env.BOXYHQSAML_ISSUER!,
       clientID: "dummy",
       clientSecret: "dummy",
       callbackURL: new URL("/auth/saml/callback", BASE_URL).toString(),
