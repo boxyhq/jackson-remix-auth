@@ -84,8 +84,8 @@ export class BoxyHQSAMLStrategy<User> extends OAuth2Strategy<
       {
         authorizationURL: `${options.issuer}/api/oauth/authorize`,
         tokenURL: `${options.issuer}/api/oauth/token`,
-        clientID: "dummy",
-        clientSecret: "dummy",
+        clientID: options.clientID,
+        clientSecret: options.clientSecret,
         callbackURL: options.callbackURL,
       },
       verify
