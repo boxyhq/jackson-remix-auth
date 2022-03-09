@@ -1,14 +1,6 @@
 import { createCookieSessionStorage } from "remix";
 import { Authenticator } from "remix-auth";
-import { OAuth2Strategy } from "remix-auth-oauth2";
-
-if (!process.env.CLIENT_ID) {
-  throw new Error("CLIENT_ID is required");
-}
-
-if (!process.env.CLIENT_SECRET) {
-  throw new Error("CLIENT_SECRET is required");
-}
+import { BoxyHQSAMLStrategy, type BoxyHQSAMLProfile } from "./lib/boxyhq-saml";
 
 if (!process.env.BASE_URL) {
   throw new Error("BASE_URL is required");
@@ -31,45 +23,19 @@ export const sessionStorage = createCookieSessionStorage({
   },
 });
 
-export interface SAMLJacksonProfile {
-  id: string;
-  email?: string;
-  firstName?: string | null;
-  lastName?: string | null;
-}
-
-export const auth = new Authenticator<{
-  profile: SAMLJacksonProfile;
-  accessToken: string;
-  extraParams: Record<string, never>;
-}>(sessionStorage);
+export const auth = new Authenticator<BoxyHQSAMLProfile>(sessionStorage);
 
 auth.use(
-  new OAuth2Strategy(
+  new BoxyHQSAMLStrategy(
     {
-      authorizationURL: `${process.env.JACKSON_SERVICE}/api/oauth/authorize`,
-      tokenURL: `${process.env.JACKSON_SERVICE}/api/oauth/token`,
-      clientID: process.env.CLIENT_ID!,
-      clientSecret: process.env.CLIENT_SECRET!,
+      domain: process.env.JACKSON_SERVICE!,
+      clientID: "dummy",
+      clientSecret: "dummy",
       callbackURL: new URL("/auth/saml/callback", BASE_URL).toString(),
     },
-    async ({ accessToken, extraParams }) => {
-      // here you can use the params above to get the user and return it
-      // what you do inside this and how you find the user is up to you
-      const res = await fetch(
-        `${process.env.JACKSON_SERVICE}/api/oauth/userinfo`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
-      const profile = await res.json();
-      return {
-        accessToken,
-        extraParams,
-        profile,
-      };
+    // eslint-disable-next-line no-empty-pattern
+    async ({ profile }) => {
+      return profile;
     }
-  ),
-  "boxyhq-saml"
+  )
 );

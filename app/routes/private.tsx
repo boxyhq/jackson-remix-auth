@@ -1,15 +1,16 @@
 import type { ActionFunction, LoaderFunction } from "remix";
 import { Form, json, useLoaderData } from "remix";
-import { auth, type SAMLJacksonProfile } from "~/auth.server";
+import { auth } from "~/auth.server";
+import { type BoxyHQSAMLProfile } from "~/lib/boxyhq-saml";
 
-type LoaderData = { profile: SAMLJacksonProfile };
+type LoaderData = { profile: BoxyHQSAMLProfile };
 
 export const action: ActionFunction = async ({ request }) => {
   await auth.logout(request, { redirectTo: "/" });
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const { profile } = await auth.isAuthenticated(request, {
+  const profile = await auth.isAuthenticated(request, {
     failureRedirect: "/",
   });
 

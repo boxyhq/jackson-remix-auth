@@ -1,4 +1,4 @@
-import type { LoaderFunction } from "remix";
+import { LoaderFunction } from "remix";
 import { Form, json, useLoaderData } from "remix";
 import { auth, sessionStorage } from "~/auth.server";
 
@@ -19,9 +19,25 @@ export default function Screen() {
   const { error } = useLoaderData<LoaderData>();
 
   return (
-    <Form method="post" action="/auth/saml">
+    <Form
+      method="post"
+      action="/auth/saml"
+      className="flex flex-col items-start space-y-4"
+    >
       {error ? <div>{error.message}</div> : null}
-      <button>Sign In with SAML</button>
+      <label htmlFor="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        name="email"
+        className="input"
+        placeholder="johndoe@example.com"
+        required
+      />
+      <input type="text" name="product" hidden defaultValue="demo" />
+      <button type="submit" className="button">
+        Sign In with SSO
+      </button>
     </Form>
   );
 }
