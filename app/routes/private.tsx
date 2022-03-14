@@ -1,7 +1,7 @@
 import type { ActionFunction, LoaderFunction } from "remix";
 import { Form, json, useLoaderData } from "remix";
 import { auth } from "~/auth.server";
-import { type BoxyHQSAMLProfile } from "~/lib/boxyhq-saml";
+import { type BoxyHQSAMLProfile } from "@boxyhq/remix-auth-saml";
 
 type LoaderData = { profile: BoxyHQSAMLProfile };
 

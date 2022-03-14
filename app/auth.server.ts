@@ -1,6 +1,9 @@
 import { createCookieSessionStorage } from "remix";
 import { Authenticator } from "remix-auth";
-import { BoxyHQSAMLStrategy, type BoxyHQSAMLProfile } from "./lib/boxyhq-saml";
+import {
+  BoxyHQSAMLStrategy,
+  type BoxyHQSAMLProfile,
+} from "@boxyhq/remix-auth-saml";
 
 if (!process.env.BASE_URL) {
   throw new Error("BASE_URL is required");
