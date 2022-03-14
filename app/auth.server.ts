@@ -21,7 +21,7 @@ export const sessionStorage = createCookieSessionStorage({
     httpOnly: true,
     path: "/",
     sameSite: "lax",
-    secrets: ["s3cret"], // This should be an env variable
+    secrets: process.env.COOKIE_SECRETS!.split(","),
     secure: process.env.NODE_ENV === "production",
   },
 });
@@ -36,7 +36,6 @@ auth.use(
       clientSecret: "dummy",
       callbackURL: new URL("/auth/saml/callback", BASE_URL).toString(),
     },
-    // eslint-disable-next-line no-empty-pattern
     async ({ profile }) => {
       return profile;
     }
