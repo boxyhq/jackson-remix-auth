@@ -8,16 +8,18 @@ import {
 } from "remix";
 import styles from "./styles/app.css";
 import type { MetaFunction } from "remix";
+import Navbar from "./components/Navbar";
+import Container from "./components/Container";
 
 export const meta: MetaFunction = () => {
-  return { title: "New Remix App" };
+  return { title: "Remix SAML Login Example" };
 };
 
 export function links() {
   return [{ rel: "stylesheet", href: styles }];
 }
 
-export default function App() {
+function Document({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -26,12 +28,21 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="p-4">
-        <Outlet />
+      <body>
+        <Navbar />
+        <Container>{children}</Container>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
       </body>
     </html>
+  );
+}
+
+export default function App() {
+  return (
+    <Document>
+      <Outlet />
+    </Document>
   );
 }
