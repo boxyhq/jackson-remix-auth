@@ -1,13 +1,9 @@
-import type { ActionFunction, LoaderFunction } from "remix";
-import { Form, json, useLoaderData } from "remix";
+import type { LoaderFunction } from "remix";
+import { json, useLoaderData } from "remix";
 import { auth } from "~/auth.server";
 import { type BoxyHQSAMLProfile } from "@boxyhq/remix-auth-saml";
 
 type LoaderData = { profile: BoxyHQSAMLProfile };
-
-export const action: ActionFunction = async ({ request }) => {
-  await auth.logout(request, { redirectTo: "/" });
-};
 
 export const loader: LoaderFunction = async ({ request }) => {
   const profile = await auth.isAuthenticated(request, {
@@ -17,16 +13,11 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json<LoaderData>({ profile });
 };
 
-export default function Screen() {
+export default function Private() {
   const { profile } = useLoaderData<LoaderData>();
   return (
     <>
-      <Form method="post">
-        <button>Log Out</button>
-      </Form>
-
-      <hr />
-
+      <h1 className="text-primary mb-4 font-bold md:text-3xl">Raw profile</h1>
       <pre>
         <code>{JSON.stringify(profile, null, 2)}</code>
       </pre>
