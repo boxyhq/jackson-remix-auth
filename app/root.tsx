@@ -1,15 +1,19 @@
 import {
+  json,
   Links,
   LiveReload,
+  LoaderFunction,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "remix";
 import styles from "./styles/app.css";
 import type { MetaFunction } from "remix";
 import Navbar from "./components/Navbar";
 import Container from "./components/Container";
+import { auth } from "./auth.server";
 
 export const meta: MetaFunction = () => {
   return { title: "Remix SAML Login Example" };
@@ -19,7 +23,16 @@ export function links() {
   return [{ rel: "stylesheet", href: styles }];
 }
 
+type LoaderData = { isLoggedIn: Boolean };
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const user = await auth.isAuthenticated(request);
+
+  return json<LoaderData>({ isLoggedIn: !!user });
+};
+
 function Document({ children }: { children: React.ReactNode }) {
+  const { isLoggedIn } = useLoaderData<LoaderData>();
   return (
     <html lang="en">
       <head>
@@ -29,7 +42,7 @@ function Document({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <Navbar />
+        <Navbar isLoggedIn={isLoggedIn} />
         <Container>{children}</Container>
         <ScrollRestoration />
         <Scripts />

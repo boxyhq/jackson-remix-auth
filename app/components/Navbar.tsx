@@ -1,10 +1,17 @@
 import { NavLink } from "remix";
 
-const styleNavLink = ({ isActive }: { isActive: Boolean }) =>
-  `inline-flex items-center px-1 pt-1 text-base text-gray-900
-  ${isActive ? "border-b-2 border-indigo-500 font-semibold" : ""}`;
+const styleNavLink = ({
+  isActive,
+  extraClasses,
+}: {
+  isActive: Boolean;
+  extraClasses?: Array<string>;
+}) =>
+  `inline-flex items-center px-1 pt-1 text-base text-gray-900 ${
+    isActive ? "border-b-2 border-indigo-500 font-semibold" : ""
+  } ${Array.isArray(extraClasses) ? extraClasses.join(" ") : ""}`;
 
-export default function Navbar() {
+export default function Navbar({ isLoggedIn }: { isLoggedIn: Boolean }) {
   return (
     <nav className="bg-white shadow">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -58,6 +65,29 @@ export default function Navbar() {
                 Private
               </NavLink>
             </div>
+            {isLoggedIn && (
+              <NavLink
+                to="/logout"
+                reloadDocument
+                className={({ isActive }) =>
+                  styleNavLink({ isActive, extraClasses: ["ml-auto"] })
+                }
+              >
+                <svg
+                  aria-hidden
+                  className="mr-2 h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Logout
+              </NavLink>
+            )}
           </div>
         </div>
       </div>
