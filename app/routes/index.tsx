@@ -1,43 +1,65 @@
-import { LoaderFunction } from "remix";
-import { Form, json, useLoaderData } from "remix";
-import { auth, sessionStorage } from "~/auth.server";
+import { json, type LoaderFunction, useCatch, useLoaderData } from "remix";
+import { auth } from "~/auth.server";
+import AccessDenied from "~/components/AccessDenied";
 
-type LoaderData = {
-  error: { message: string } | null;
-};
-
+type LoaderData = { content: string };
 export const loader: LoaderFunction = async ({ request }) => {
-  await auth.isAuthenticated(request, { successRedirect: "/private" });
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
-  const error = session.get(auth.sessionErrorKey) as LoaderData["error"];
-  return json<LoaderData>({ error });
+  const user = await auth.isAuthenticated(request);
+
+  if (!user) {
+    throw json(
+      {
+        content:
+          "You must be signed in to view the protected content on this page.",
+      },
+      { status: 401 }
+    );
+  }
+  return json<LoaderData>({
+    content:
+      "This is protected content. You can access this content because you are signed in.",
+  });
 };
 
-export default function Screen() {
-  const { error } = useLoaderData<LoaderData>();
+export default function Home() {
+  const { content } = useLoaderData<LoaderData>();
 
   return (
-    <Form
-      method="post"
-      action="/auth/saml"
-      className="flex flex-col items-start space-y-4"
-    >
-      {error ? <div>{error.message}</div> : null}
-      <label htmlFor="email">Email</label>
-      <input
-        id="email"
-        type="email"
-        name="email"
-        className="input"
-        placeholder="johndoe@example.com"
-        required
-      />
-      <input type="text" name="product" hidden defaultValue="demo" />
-      <button type="submit" className="button">
-        Sign In with SSO
-      </button>
-    </Form>
+    <div className="space-y-4">
+      <h1>Protected Page</h1>
+      <p>
+        <strong>{JSON.stringify(content) ?? "\u00a0"}</strong>
+      </p>
+    </div>
+  );
+}
+
+// Export a CatchBoundary and use the useCatch hook to handle thrown responses
+// like the 404 we have in our loader.
+// You can also catch thrown responses from actions as well.
+export function CatchBoundary() {
+  const caught = useCatch();
+
+  switch (caught.status) {
+    case 401: {
+      return <AccessDenied />;
+    }
+    default: {
+      // if we don't handle this then all bets are off. Just throw an error
+      // and let the nearest ErrorBoundary handle this
+      throw new Error(`${caught.status} not handled`);
+    }
+  }
+}
+
+// this will handle unexpected errors (like the default case above where the
+// CatchBoundary gets a response it's not prepared to handle).
+export function ErrorBoundary({ error }: { error: Error }) {
+  console.error(error);
+
+  return (
+    <div>
+      <pre>{JSON.stringify(error, null, 2)}</pre>
+    </div>
   );
 }
