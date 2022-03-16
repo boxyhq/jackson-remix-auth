@@ -10,7 +10,9 @@ export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
 
   const email = formData.get("email");
-  const product = await formData.get("product");
+  // const product = await formData.get("product");
+  // Use the above to get the product from client side
+  const product = "saml-demo.boxyhq.com";
 
   const errors: PostError = {};
   if (!email) errors.email = true;
@@ -21,8 +23,9 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   invariant(typeof email === "string");
-
-  const tenant = email.split("@")[1];
+  // extracting the tenant from email is one way to set it
+  // const tenant = email.split("@")[1];
+  const tenant = "boxyhq.com";
   return await auth.authenticate("boxyhq-saml", request, {
     successRedirect: "/private",
     failureRedirect: "/",
