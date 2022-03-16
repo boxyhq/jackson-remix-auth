@@ -7,6 +7,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const user = await auth.isAuthenticated(request);
 
   if (!user) {
+    // This will be caught in the CatchBoundary defined below
     throw json(
       {
         content:
@@ -26,9 +27,9 @@ export default function Home() {
 
   return (
     <div className="space-y-4">
-      <h1>Protected Page</h1>
+      <h1 className="text-primary font-bold md:text-3xl">Protected Page</h1>
       <p>
-        <strong>{JSON.stringify(content) ?? "\u00a0"}</strong>
+        <strong>{content ?? "\u00a0"}</strong>
       </p>
     </div>
   );
