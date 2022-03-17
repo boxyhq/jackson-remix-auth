@@ -3,7 +3,7 @@ This demo shows how to use [BoxyHQSAMLStrategy](https://www.npmjs.com/package/@b
 
 
 ## BoxyHQ SAML Service Provider
-This demo uses a h[osted demo instance](https://jackson-demo.boxyhq.com) of [jackson](https://github.com/boxyhq/jackson) as the SAML Service Provider. Tenant and product config is already set up for [Mock SAML Provider](https://mocksaml.com).
+This demo uses a [hosted demo instance](https://jackson-demo.boxyhq.com) of [jackson](https://github.com/boxyhq/jackson) as the SAML Service Provider. Tenant and product config is already set up for [Mock SAML Provider](https://mocksaml.com).
 
 ## Routes
 
