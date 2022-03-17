@@ -1,53 +1,19 @@
-# Welcome to Remix!
+# Remix Demo App with SAML Auth
+This demo shows how to use [BoxyHQSAMLStrategy](https://www.npmjs.com/package/@boxyhq/remix-auth-saml) to integrate SAML login into any remix application.
 
-- [Remix Docs](https://remix.run/docs)
 
-## Development
+## BoxyHQ SAML Service Provider
+This demo uses [jackson](https://jackson-demo.boxyhq.com) as the SAML Service Provider. Tenant and product config is already set up for [Mock SAML Provider](mocksaml.com).
 
-From your terminal:
+## Routes
 
-```sh
-npm run dev
-```
+1. `/` - Renders protected content if user is logged in.
 
-This starts your app in development mode, rebuilding assets on file changes.
+2. `/login` - Renders a form (action - `/auth/saml`) with input box which can take in a email that can be used to switch SAML tenant dynamically. See [auth.saml.tsx](app/routes/auth.saml.tsx#L33).
+3. `/logout`
+4. `/auth/saml` - Action handler for login initiating the OAuth 2.0 flow to the SAML IdP.
+5. `/auth/saml/callback` - Handles the redirection from the SAML Service Provider
 
-## Deployment
+## FUTURE UPDATES
 
-First, build your app for production:
-
-```sh
-npm run build
-```
-
-Then run the app in production mode:
-
-```sh
-npm start
-```
-
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `remix build`
-
-- `build/`
-- `public/build/`
-
-### Using a Template
-
-When you ran `npx create-remix@latest` there were a few choices for hosting. You can run that again to create a new project, then copy over your `app/` folder to the new project that's pre-configured for your target server.
-
-```sh
-cd ..
-# create a new project, and pick a pre-configured host
-npx create-remix@latest
-cd my-new-remix-app
-# remove the new project's app (not the old one!)
-rm -rf app
-# copy your app over
-cp -R ../my-old-remix-app/app app
-```
+We are looking into embed the SAML Service Provider logic into the app, to remove the dependency of a separate hosted service.
