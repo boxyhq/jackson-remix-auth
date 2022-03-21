@@ -27,6 +27,7 @@ export const sessionStorage = createCookieSessionStorage({
 
 export const auth = new Authenticator<BoxyHQSAMLProfile>(sessionStorage);
 
+// This strategy points to an hosted jackson instance
 auth.use(
   new BoxyHQSAMLStrategy(
     {
@@ -40,11 +41,11 @@ auth.use(
     }
   )
 );
-
+// This strategy points to the remix app host (with the resource routes setup to handle SAML flow)
 auth.use(
   new BoxyHQSAMLStrategy(
     {
-      issuer: process.env.BOXYHQSAML_ISSUER,
+      issuer: process.env.BOXYHQSAML_ISSUER, //same as the APP URL
       clientID: "dummy",
       clientSecret: "dummy",
       callbackURL: new URL("/auth/saml/callback", BASE_URL).toString(),
