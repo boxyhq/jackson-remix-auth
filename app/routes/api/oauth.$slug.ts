@@ -91,22 +91,30 @@ export const action: ActionFunction = async ({ params, request }) => {
     throw new Response("Method Not Allowed", { status: 405 });
   }
 
+  let body;
+  const contentType = request.headers.get("Content-Type");
+  if (contentType === "application/x-www-form-urlencoded") {
+    body = Object.fromEntries(await request.formData());
+  } else if (contentType === "application/json") {
+    body = await request.json();
+  } else {
+    throw new Response("Unsupported Media Type", { status: 415 });
+  }
+
   const url = new URL(request.url);
   switch (operation) {
     case "saml": {
       const { oauthController } = await JacksonProvider({
         appBaseUrl: url.origin,
       });
-      const { redirect_url } = await oauthController.samlResponse(
-        await request.json()
-      );
+      const { redirect_url } = await oauthController.samlResponse(body);
       return redirect(redirect_url, 302);
     }
     case "token": {
       const { oauthController } = await JacksonProvider({
         appBaseUrl: url.origin,
       });
-      const tokenRes = await oauthController.token(await request.json());
+      const tokenRes = await oauthController.token(body);
 
       return json(tokenRes);
     }
