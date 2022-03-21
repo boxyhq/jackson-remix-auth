@@ -6,6 +6,7 @@ import type {
   IAPIController,
   IOAuthController,
 } from "@boxyhq/saml-jackson";
+import invariant from "tiny-invariant";
 
 const opts: JacksonOption = {
   externalUrl: "", // APP BASE URL
@@ -66,5 +67,16 @@ const extractAuthTokenFromHeader = (request: Request) => {
   return null;
 };
 
+const validateApiKey = (key: string) => {
+  // Server side error -> Should be caught by nearest ErrorBoundary
+  invariant(
+    typeof process.env.JACKSON_API_KEYS === "string" &&
+      process.env.JACKSON_API_KEYS.split(",").some((k) => !!k),
+    "Expected JACKSON_API_KEYS to be set with atleast one valid key"
+  );
+  const apiKeys = process.env.JACKSON_API_KEYS.split(",");
+  return apiKeys.includes(key);
+};
+
 export default JacksonProvider;
-export { extractAuthTokenFromHeader, type OAuthReqBody };
+export { extractAuthTokenFromHeader, validateApiKey, type OAuthReqBody };
