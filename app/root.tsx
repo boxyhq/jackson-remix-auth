@@ -2,11 +2,13 @@ import {
   json,
   Links,
   LiveReload,
-  LoaderFunction,
+  type LoaderFunction,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  type ThrownResponse,
+  useCatch,
   useLoaderData,
 } from "remix";
 import styles from "./styles/app.css";
@@ -31,7 +33,13 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json<LoaderData>({ isLoggedIn: !!user });
 };
 
-function Document({ children }: { children: React.ReactNode }) {
+function Document({
+  children,
+  title,
+}: {
+  children: React.ReactNode;
+  title?: string;
+}) {
   const { isLoggedIn } = useLoaderData<LoaderData>();
   return (
     <html lang="en">
@@ -39,6 +47,7 @@ function Document({ children }: { children: React.ReactNode }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
+        <title>{title}</title>
         <Links />
       </head>
       <body>
@@ -49,6 +58,32 @@ function Document({ children }: { children: React.ReactNode }) {
         <LiveReload />
       </body>
     </html>
+  );
+}
+//  For unexpected server side errors
+export function ErrorBoundary({ error }: { error: Error }) {
+  return (
+    <Document>
+      <div>
+        <h1>App Error</h1>
+        <pre>{error.message}</pre>
+      </div>
+    </Document>
+  );
+}
+// For thrown responses or expected errors
+export function CatchBoundary() {
+  const caught = useCatch<ThrownResponse>();
+
+  return (
+    <Document title={`${caught.status} ${caught.statusText}`}>
+      <div>
+        <h1>
+          {caught.status} {caught.statusText}
+        </h1>
+        <pre>{caught.data}</pre>
+      </div>
+    </Document>
   );
 }
 
