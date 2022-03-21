@@ -25,7 +25,7 @@ export const action: ActionFunction = async ({ request }) => {
   const contentType = request.headers.get("Content-Type");
   let body;
   if (contentType === "application/x-www-form-urlencoded") {
-    body = await request.formData();
+    body = Object.fromEntries(await request.formData());
   } else if (contentType === "application/json") {
     body = await request.json();
   } else {
