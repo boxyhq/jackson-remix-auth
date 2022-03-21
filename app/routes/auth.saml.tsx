@@ -26,7 +26,7 @@ export const action: ActionFunction = async ({ request }) => {
   // extracting the tenant from email is one way to set it
   // const tenant = email.split("@")[1];
   const tenant = "boxyhq.com";
-  return await auth.authenticate("boxyhq-saml", request, {
+  return await auth.authenticate("boxyhq-saml-embed", request, {
     successRedirect: "/private",
     failureRedirect: "/",
     context: {
