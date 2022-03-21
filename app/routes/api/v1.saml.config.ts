@@ -2,7 +2,7 @@ import { ActionFunction, json, LoaderFunction } from "remix";
 import JacksonProvider, {
   extractAuthTokenFromHeader,
   validateApiKey,
-} from "~/auth.jackson";
+} from "~/auth.jackson.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);

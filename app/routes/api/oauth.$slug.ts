@@ -3,7 +3,7 @@ import invariant from "tiny-invariant";
 import JacksonProvider, {
   extractAuthTokenFromHeader,
   type OAuthReqBody,
-} from "~/auth.jackson";
+} from "~/auth.jackson.server";
 
 // Handles GET /api/oauth/authorize, GET /api/oauth/userinfo
 export const loader: LoaderFunction = async ({ params, request }) => {
