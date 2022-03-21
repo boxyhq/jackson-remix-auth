@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@boxyhq/remix-auth-saml": "^1.0.0",
-    "@boxyhq/saml-jackson": "^0.4.3",
+    "@boxyhq/saml-jackson": "^0.5.1",
     "@remix-run/react": "^1.2.3",
     "@remix-run/serve": "^1.2.3",
     "cross-env": "^7.0.3",
