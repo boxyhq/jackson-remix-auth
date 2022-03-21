@@ -27,7 +27,7 @@ export const sessionStorage = createCookieSessionStorage({
 
 export const auth = new Authenticator<BoxyHQSAMLProfile>(sessionStorage);
 
-// This strategy points to an hosted jackson instance
+// This strategy points to a hosted jackson instance
 auth.use(
   new BoxyHQSAMLStrategy(
     {
