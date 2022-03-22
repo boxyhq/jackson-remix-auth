@@ -79,4 +79,5 @@ auth.use(
 ## FAQ
 
 1. How is tenant/product passed from client side ?
+   
    [Login](app/routes/login.tsx) has an email input which could be used to discover tenant from the domain. This is one of several ways which can include using the DNS subdomain, or a dropdown. The demo is using the `boxyhq.com` and `saml-demo.boxyhq.com` which is already setup in the demo jackson SAML Service Provider (https://jackson-demo.boxyhq.com)
