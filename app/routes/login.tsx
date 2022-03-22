@@ -38,7 +38,7 @@ export default function Login() {
               id="email"
               type="email"
               name="email"
-              disabled
+              readOnly
               defaultValue="jackson@boxyhq.com"
               className="input w-full"
               placeholder="johndoe@example.com"
