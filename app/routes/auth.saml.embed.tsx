@@ -31,7 +31,7 @@ export const action: ActionFunction = async ({ request }) => {
     failureRedirect: "/",
     context: {
       clientID: `tenant=${tenant}&product=${product}`,
-      clientSecret: "dummy",
+      clientSecret: process.env.CLIENT_SECRET_VERIFIER || "dummy",
     },
   });
 };
