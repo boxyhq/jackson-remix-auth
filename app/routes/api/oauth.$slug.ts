@@ -18,59 +18,55 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   }
 
   const url = new URL(request.url);
-  switch (operation) {
-    case "authorize": {
-      // rightmost query param will win in case of multiple ones with same name
-      const queryParams = Object.fromEntries(
-        url.searchParams.entries()
-      ) as unknown as OAuthReqBody;
 
-      const { oauthController } = await JacksonProvider({
-        appBaseUrl: url.origin,
-      });
+  const { oauthController } = await JacksonProvider({
+    appBaseUrl: url.origin,
+  });
 
-      const { redirect_url, authorize_form } = await oauthController.authorize(
-        queryParams
-      );
+  // rightmost query param will win in case of multiple ones with same name
+  const queryParams = Object.fromEntries(url.searchParams.entries());
 
-      if (redirect_url) {
-        //  Redirect binding
-        return redirect(redirect_url, 302);
-      } else {
-        //  POST Binding
-        return new Response(authorize_form, {
-          status: 200,
-          headers: {
-            "Content-Type": "text/html; charset=utf-8",
-          },
-        });
+  try {
+    switch (operation) {
+      case "authorize": {
+        const { redirect_url, authorize_form } =
+          await oauthController.authorize(
+            queryParams as unknown as OAuthReqBody
+          );
+        if (redirect_url) {
+          //  Redirect binding
+          return redirect(redirect_url, 302);
+        } else {
+          //  POST Binding
+          return new Response(authorize_form, {
+            status: 200,
+            headers: {
+              "Content-Type": "text/html; charset=utf-8",
+            },
+          });
+        }
+      }
+      case "userinfo": {
+        let token: string | null = extractAuthTokenFromHeader(request);
+
+        // check for query param
+        if (!token) {
+          token = queryParams.access_token;
+        }
+
+        if (!token) {
+          return new Response("Unauthorized", {
+            status: 401,
+          });
+        }
+
+        const profile = await oauthController.userInfo(token);
+        return json(profile);
       }
     }
-    case "userinfo": {
-      // rightmost query param will win in case of multiple ones with same name
-      const queryParams = Object.fromEntries(
-        url.searchParams.entries()
-      ) as unknown as { access_token: string };
-
-      const { oauthController } = await JacksonProvider({
-        appBaseUrl: url.origin,
-      });
-      let token: string | null = extractAuthTokenFromHeader(request);
-
-      // check for query param
-      if (!token) {
-        token = queryParams.access_token;
-      }
-
-      if (!token) {
-        return new Response("Unauthorized", {
-          status: 401,
-        });
-      }
-
-      const profile = await oauthController.userInfo(token);
-      return json(profile);
-    }
+  } catch (error: any) {
+    const { message, statusCode = 500 } = error;
+    throw new Response(message, { status: statusCode });
   }
 };
 
@@ -102,21 +98,22 @@ export const action: ActionFunction = async ({ params, request }) => {
   }
 
   const url = new URL(request.url);
-  switch (operation) {
-    case "saml": {
-      const { oauthController } = await JacksonProvider({
-        appBaseUrl: url.origin,
-      });
-      const { redirect_url } = await oauthController.samlResponse(body);
-      return redirect(redirect_url, 302);
+  const { oauthController } = await JacksonProvider({
+    appBaseUrl: url.origin,
+  });
+  try {
+    switch (operation) {
+      case "saml": {
+        const { redirect_url } = await oauthController.samlResponse(body);
+        return redirect(redirect_url, 302);
+      }
+      case "token": {
+        const tokenRes = await oauthController.token(body);
+        return json(tokenRes);
+      }
     }
-    case "token": {
-      const { oauthController } = await JacksonProvider({
-        appBaseUrl: url.origin,
-      });
-      const tokenRes = await oauthController.token(body);
-
-      return json(tokenRes);
-    }
+  } catch (error: any) {
+    const { message, statusCode = 500 } = error;
+    throw new Response(message, { status: statusCode });
   }
 };

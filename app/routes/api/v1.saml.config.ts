@@ -17,7 +17,13 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   const { apiController } = await JacksonProvider({ appBaseUrl: url.origin });
-  return json(await apiController.getConfig(queryParams));
+
+  try {
+    return json(await apiController.getConfig(queryParams));
+  } catch (error: any) {
+    const { message, statusCode = 500 } = error;
+    throw new Response(message, { status: statusCode });
+  }
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -39,14 +45,19 @@ export const action: ActionFunction = async ({ request }) => {
 
   const { apiController } = await JacksonProvider({ appBaseUrl: url.origin });
 
-  switch (request.method) {
-    case "POST":
-      return json(await apiController.config(body));
-    case "PATCH":
-      await apiController.updateConfig(body);
-      return new Response(null, { status: 204 });
-    case "DELETE":
-      await apiController.deleteConfig(body);
-      return new Response(null, { status: 204 });
+  try {
+    switch (request.method) {
+      case "POST":
+        return json(await apiController.config(body));
+      case "PATCH":
+        await apiController.updateConfig(body);
+        return new Response(null, { status: 204 });
+      case "DELETE":
+        await apiController.deleteConfig(body);
+        return new Response(null, { status: 204 });
+    }
+  } catch (error: any) {
+    const { message, statusCode = 500 } = error;
+    throw new Response(message, { status: statusCode });
   }
 };
