@@ -38,7 +38,7 @@ export default function Login() {
               type="email"
               name="email"
               disabled
-              defaultValue="john@boxyhq.com"
+              defaultValue="jackson@boxyhq.com"
               className="input w-full"
               placeholder="johndoe@example.com"
               required
