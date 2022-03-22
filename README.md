@@ -1,13 +1,13 @@
 # Remix Demo App with SAML Auth
 This demo shows how to use [BoxyHQSAMLStrategy](https://www.npmjs.com/package/@boxyhq/remix-auth-saml) to integrate SAML login into any remix application. 
 Two different setups are shown in this demo 
-1. With a hosted SAML Service Provider
-2. With the SAML Service Provider functionality embedded within the remix app using resource routes.
+1. With a [hosted](#boxyhq-saml-service-provider) SAML Service Provider
+2. With the SAML Service Provider functionality [embedded](#embed-saml-service-provider) within the remix app using resource routes.
 
 ## BoxyHQ SAML Service Provider
 This uses a [hosted demo instance](https://jackson-demo.boxyhq.com) of [jackson](https://github.com/boxyhq/jackson) as the SAML Service Provider. Tenant and product config is already set up for [Mock SAML Provider](https://mocksaml.com).
 
-## SAML Service Embedding
+## Embed SAML Service Provider
 This uses the [jackson npm package](https://www.npmjs.com/package/@boxyhq/saml-jackson) which provides all the bare-bones of SAML. See `JacksonProvider` in [auth.jackson.server.ts](app/auth.jackson.server.ts#L31) where the SAML controllers `{ apiController, oauthController }` are exposed. The resource routes for SAML flow are added in [app/routes/api](app/routes/api). You'll also need to [setup](app/auth.jackson.server.ts#L16) a database for this. More info on the SAML SP options at https://boxyhq.com/docs/jackson/deploy/env-variables.
 
 Once the app is running [configure](https://boxyhq.com/docs/jackson/saml-flow#2-saml-config-api) a SAML IdP as shown below
@@ -75,3 +75,8 @@ auth.use(
   "boxyhq-saml-embed"
 );
 ```
+
+## FAQ
+
+1. How is tenant/product passed from client side ?
+   [Login](app/routes/login.tsx) has an email input which could be used to discover tenant from the domain. This is one of several ways which can include using the DNS subdomain, or a dropdown. The demo is using the `boxyhq.com` and `saml-demo.boxyhq.com` which is already setup in the demo jackson SAML Service Provider (https://jackson-demo.boxyhq.com)
