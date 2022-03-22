@@ -25,6 +25,51 @@ export function links() {
   return [{ rel: "stylesheet", href: styles }];
 }
 
+//  For unexpected server side errors
+export function ErrorBoundary({ error }: { error: Error }) {
+  console.error(error);
+  return (
+    <html>
+      <head>
+        <title>Error ⚠️</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <div>
+          <h1>App Error</h1>
+          <p>{error.message}</p>
+          <p>The stack trace is:</p>
+          <pre>{error.stack}</pre>
+        </div>
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+// For thrown responses or expected errors
+export function CatchBoundary() {
+  const caught = useCatch<ThrownResponse>();
+
+  return (
+    <html>
+      <head>
+        <title>{`${caught.status} ${caught.statusText}`}</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <h1>
+          {caught.status} {caught.statusText}
+        </h1>
+        <code>{JSON.stringify(caught.data, null, 2)}</code>
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
 type LoaderData = { isLoggedIn: Boolean };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -33,13 +78,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json<LoaderData>({ isLoggedIn: !!user });
 };
 
-function Document({
-  children,
-  title,
-}: {
-  children: React.ReactNode;
-  title?: string;
-}) {
+export default function App({ title }: { title?: string }) {
   const { isLoggedIn } = useLoaderData<LoaderData>();
   return (
     <html lang="en">
@@ -52,45 +91,13 @@ function Document({
       </head>
       <body>
         <Navbar isLoggedIn={isLoggedIn} />
-        <Container>{children}</Container>
+        <Container>
+          <Outlet />
+        </Container>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
       </body>
     </html>
-  );
-}
-//  For unexpected server side errors
-export function ErrorBoundary({ error }: { error: Error }) {
-  return (
-    <Document>
-      <div>
-        <h1>App Error</h1>
-        <pre>{error.message}</pre>
-      </div>
-    </Document>
-  );
-}
-// For thrown responses or expected errors
-export function CatchBoundary() {
-  const caught = useCatch<ThrownResponse>();
-
-  return (
-    <Document title={`${caught.status} ${caught.statusText}`}>
-      <div>
-        <h1>
-          {caught.status} {caught.statusText}
-        </h1>
-        <pre>{caught.data}</pre>
-      </div>
-    </Document>
-  );
-}
-
-export default function App() {
-  return (
-    <Document>
-      <Outlet />
-    </Document>
   );
 }
