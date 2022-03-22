@@ -8,6 +8,7 @@ import type {
 } from "@boxyhq/saml-jackson";
 import invariant from "tiny-invariant";
 
+// 📄 https://boxyhq.com/docs/jackson/deploy/env-variables
 const opts: JacksonOption = {
   externalUrl: "", // APP BASE URL
   samlPath: "/api/oauth/saml",
