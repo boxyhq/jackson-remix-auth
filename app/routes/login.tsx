@@ -46,7 +46,14 @@ export default function Login() {
               type="submit"
               className="w-full rounded border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white focus:outline-none"
             >
-              Continue with SAML SSO
+              Continue with SAML SSO (Hosted SAML Provider)
+            </button>
+            <button
+              type="submit"
+              formAction="/auth/saml/embed"
+              className="w-full rounded border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white focus:outline-none"
+            >
+              Continue with SAML SSO (Embedded SAML Provider)
             </button>
           </Form>
         </div>
