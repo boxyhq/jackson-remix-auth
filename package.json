@@ -5,12 +5,12 @@
   "license": "MIT",
   "sideEffects": false,
   "scripts": {
-    "build": "npm run build:css && cross-env NODE_ENV=production remix build",
+    "build": "npm run build:css && remix build",
     "build:css": "tailwindcss -m -i ./styles/app.css -o app/styles/app.css",
-    "dev": "concurrently \"npm run dev:css\" \"cross-env NODE_ENV=development remix dev\"",
+    "dev": "concurrently \"npm run dev:css\" \"cross-env NODE_ENV=development PORT=3366 remix dev\"",
     "dev:css": "tailwindcss -w -i ./styles/app.css -o app/styles/app.css",
     "postinstall": "remix setup node",
-    "start": "cross-env NODE_ENV=production remix-serve build"
+    "start": "cross-env NODE_ENV=production PORT=3366 remix-serve build"
   },
   "dependencies": {
     "@boxyhq/remix-auth-saml": "^1.0.0",
