@@ -41,14 +41,14 @@ auth.use(
     }
   )
 );
-// This strategy points to the remix app host (with the resource routes setup to handle SAML flow)
+// This strategy points to the same remix app host (resource routes are setup to handle SAML flow)
 auth.use(
   new BoxyHQSAMLStrategy(
     {
       issuer: process.env.BOXYHQSAML_ISSUER, //same as the APP URL
       clientID: "dummy",
       clientSecret: "dummy",
-      callbackURL: new URL("/auth/saml/callback", BASE_URL).toString(),
+      callbackURL: new URL("/auth/saml/embed/callback", BASE_URL).toString(),
     },
     async ({ profile }) => {
       return profile;
