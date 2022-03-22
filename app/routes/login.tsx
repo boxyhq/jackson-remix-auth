@@ -30,6 +30,7 @@ export default function Login() {
             method="post"
             action="/auth/saml"
             className="flex flex-col items-start space-y-4"
+            reloadDocument
           >
             {error ? <div>{error.message}</div> : null}
             <label htmlFor="email">Work Email</label>
