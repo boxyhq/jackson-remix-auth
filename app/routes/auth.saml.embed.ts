@@ -28,7 +28,7 @@ export const action: ActionFunction = async ({ request }) => {
   const tenant = "boxyhq.com";
   return await auth.authenticate("boxyhq-saml-embed", request, {
     successRedirect: "/private",
-    failureRedirect: "/",
+    failureRedirect: "/login",
     context: {
       clientID: `tenant=${tenant}&product=${product}`,
       clientSecret: process.env.CLIENT_SECRET_VERIFIER || "dummy",
