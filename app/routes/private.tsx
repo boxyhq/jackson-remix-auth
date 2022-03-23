@@ -7,7 +7,7 @@ type LoaderData = { profile: BoxyHQSAMLProfile };
 
 export const loader: LoaderFunction = async ({ request }) => {
   const profile = await auth.isAuthenticated(request, {
-    failureRedirect: "/",
+    failureRedirect: "/login",
   });
 
   return json<LoaderData>({ profile });
