@@ -35,7 +35,7 @@ curl --location --request POST 'http://localhost:3366/api/v1/saml/config' \
 2. `/login` - Renders a form (action - `/auth/saml`) with input box which can take in a email that can be used to switch SAML tenant dynamically. See [auth.saml.tsx](app/routes/auth.saml.tsx#L33).
 3. `/logout`
 4. `/auth/saml` (hosted),`/auth/saml/embed`(embedded) - Action handlers for login initiating the OAuth 2.0 flow to the SAML IdP.
-5. `/auth/saml/callback` (hosted),`/auth/saml/embed/callback` (embedded)- Handles the redirection from the SAML Service Provider.
+5. `/auth/saml/callback` (hosted),`/auth/saml/embed/callback` (embedded) - SAML Service Provider (Jackson) after parsing the SAML response from IdP redirects back here with the authorization code. The SAML strategy uses the code to obtain the token and further the user profile and finally redirects back to successRedirect path.
 
 ## Strategy Usage
 
