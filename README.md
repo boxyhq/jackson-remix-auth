@@ -8,7 +8,7 @@ Two different setups are shown in this demo
 This uses a [hosted demo instance](https://jackson-demo.boxyhq.com) of [jackson](https://github.com/boxyhq/jackson) as the SAML Service Provider. Tenant and product config is already set up for [Mock SAML Provider](https://mocksaml.com).
 
 ## Embed SAML Service Provider
-This uses the [jackson npm package](https://www.npmjs.com/package/@boxyhq/saml-jackson) which provides all the bare-bones of SAML. See `JacksonProvider` in [auth.jackson.server.ts](app/auth.jackson.server.ts#L31) where the SAML controllers `{ apiController, oauthController }` are exposed. The resource routes for SAML flow are added in [app/routes/api](app/routes/api). You'll also need to [setup](app/auth.jackson.server.ts#L16) a database for this. More info on the SAML SP options at https://boxyhq.com/docs/jackson/deploy/env-variables.
+This uses the [jackson npm package](https://www.npmjs.com/package/@boxyhq/saml-jackson) which provides all the bare-bones of SAML. See `JacksonProvider` in [auth.jackson.server.ts](app/auth.jackson.server.ts#L32) where the SAML controllers `{ apiController, oauthController }` are exposed. The resource routes for SAML flow are added in [app/routes/api](app/routes/api). You'll also need to [setup](app/auth.jackson.server.ts#L16) a database for this. More info on the SAML SP options at https://boxyhq.com/docs/jackson/deploy/env-variables.
 
 Once the app is running [configure](https://boxyhq.com/docs/jackson/saml-flow#2-saml-config-api) a SAML IdP as shown below
 <details>
@@ -32,7 +32,7 @@ curl --location --request POST 'http://localhost:3366/api/v1/saml/config' \
 
 1. `/` - Renders protected content if user is logged in.
 
-2. `/login` - Renders a form (action - `/auth/saml`) with input box which can take in a email that can be used to switch SAML tenant dynamically. See [auth.saml.tsx](app/routes/auth.saml.ts#L34).
+2. `/login` - Renders a form (action - `/auth/saml`) with input box which can take in a email that can be used to [switch](app/routes/auth.saml.ts#L34) SAML tenant dynamically.
 3. `/logout`
 4. `/auth/saml` (hosted),`/auth/saml/embed`(embedded) - Action handlers for login initiating the OAuth 2.0 flow to the SAML IdP.
 5. `/auth/saml/callback` (hosted),`/auth/saml/embed/callback` (embedded) - SAML Service Provider (Jackson) after parsing the SAML response from IdP redirects back here with the authorization code. The SAML strategy uses the code to obtain the token and further the user profile and finally redirects back to successRedirect path.
