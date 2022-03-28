@@ -1,6 +1,6 @@
 # Remix Demo App with SAML Auth
 This demo shows how to use [BoxyHQSAMLStrategy](https://www.npmjs.com/package/@boxyhq/remix-auth-saml) to integrate SAML login into any remix application. 
-Two different setups are shown in this demo 
+Two different SAML Service Provider setups are shown in this demo 
 1. With a [hosted](#boxyhq-saml-service-provider) SAML Service Provider
 2. With the SAML Service Provider functionality [embedded](#embed-saml-service-provider) within the remix app using resource routes.
 
