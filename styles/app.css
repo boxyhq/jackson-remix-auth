@@ -18,4 +18,7 @@
   .form-validation-error {
     @apply m-0 mt-1 text-xs text-red-400;
   }
+  .dot-pattern {
+    @apply bg-[#e5e5f7] bg-polka-pattern bg-[length:10px_10px] bg-[0%_10px] opacity-80;
+  }
 }

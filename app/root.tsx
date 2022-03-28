@@ -10,6 +10,7 @@ import {
   type ThrownResponse,
   useCatch,
   useLoaderData,
+  useLocation,
 } from "remix";
 import styles from "./styles/app.css";
 import type { MetaFunction } from "remix";
@@ -80,6 +81,29 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function App({ title }: { title?: string }) {
   const { isLoggedIn } = useLoaderData<LoaderData>();
+
+  const location = useLocation();
+
+  if (location.pathname === "/error") {
+    return (
+      <html lang="en" className="h-full">
+        <head>
+          <meta charSet="utf-8" />
+          <meta name="viewport" content="width=device-width,initial-scale=1" />
+          <Meta />
+          <title>{title}</title>
+          <Links />
+        </head>
+        <body className="h-full">
+          <Outlet />
+          <ScrollRestoration />
+          <Scripts />
+          <LiveReload />
+        </body>
+      </html>
+    );
+  }
+
   return (
     <html lang="en">
       <head>
