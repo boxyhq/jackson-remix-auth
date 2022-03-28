@@ -1,12 +1,22 @@
+// NOTE: This is purely a resource route, eventhough some part of it like the /authorize happens in the browser, it's not part of the
+// host app. Any error for the browser flow (/authorize or /saml) can be set as a flash message and redirected to an error page for jackson
+// Other errors(/userinfo and /token) can be thrown and should be caught by the host app CatchBoundary
 import { ActionFunction, json, LoaderFunction, redirect } from "remix";
 import invariant from "tiny-invariant";
 import JacksonProvider, {
   extractAuthTokenFromHeader,
   type OAuthReqBody,
 } from "~/auth.jackson.server";
+import {
+  commitSession,
+  getSession,
+  JACKSON_ERROR_COOKIE_KEY,
+} from "~/sessions.server";
 
 // Handles GET /api/oauth/authorize, GET /api/oauth/userinfo
 export const loader: LoaderFunction = async ({ params, request }) => {
+  const session = await getSession(request.headers.get("Cookie"));
+
   // maybe you change the name of the file to oauth.$somethingElse.ts, below invariant validates that the params is defined
   invariant(params.slug, "expected params.slug");
   const operation = params.slug;
@@ -26,9 +36,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   // rightmost query param will win in case of multiple ones with same name
   const queryParams = Object.fromEntries(url.searchParams.entries());
 
-  try {
-    switch (operation) {
-      case "authorize": {
+  switch (operation) {
+    case "authorize": {
+      try {
         const { redirect_url, authorize_form } =
           await oauthController.authorize(
             queryParams as unknown as OAuthReqBody
@@ -45,33 +55,44 @@ export const loader: LoaderFunction = async ({ params, request }) => {
             },
           });
         }
-      }
-      case "userinfo": {
-        let token: string | null = extractAuthTokenFromHeader(request);
-
-        // check for query param
-        if (!token) {
-          token = queryParams.access_token;
-        }
-
-        if (!token) {
-          return new Response("Unauthorized", {
-            status: 401,
-          });
-        }
-
-        const profile = await oauthController.userInfo(token);
-        return json(profile);
+      } catch (err: any) {
+        console.error("authorize error:", err);
+        const { message, statusCode = 500 } = err;
+        // set error in cookie redirect to error page
+        session.flash(JACKSON_ERROR_COOKIE_KEY, { message, statusCode });
+        return redirect("/error", {
+          headers: { "Set-Cookie": await commitSession(session) },
+        });
       }
     }
-  } catch (error: any) {
-    const { message, statusCode = 500 } = error;
-    throw new Response(message, { status: statusCode });
+    case "userinfo": {
+      let token: string | null = extractAuthTokenFromHeader(request);
+
+      // check for query param
+      if (!token) {
+        token = queryParams.access_token;
+      }
+
+      if (!token) {
+        return new Response("Unauthorized", {
+          status: 401,
+        });
+      }
+      try {
+        const profile = await oauthController.userInfo(token);
+        return json(profile);
+      } catch (error: any) {
+        const { message, statusCode = 500 } = error;
+        throw new Response(message, { status: statusCode });
+      }
+    }
   }
 };
 
 // Handles POST /api/oauth/saml, POST /api/oauth/token
 export const action: ActionFunction = async ({ params, request }) => {
+  const session = await getSession(request.headers.get("Cookie"));
+
   // maybe you change the name of the file to $somethingElse.ts, below invariant validates that the params is defined
   invariant(params.slug, "expected params.slug");
   const operation = params.slug;
@@ -101,19 +122,29 @@ export const action: ActionFunction = async ({ params, request }) => {
   const { oauthController } = await JacksonProvider({
     appBaseUrl: url.origin,
   });
-  try {
-    switch (operation) {
-      case "saml": {
+  switch (operation) {
+    case "saml": {
+      try {
         const { redirect_url } = await oauthController.samlResponse(body);
         return redirect(redirect_url, 302);
-      }
-      case "token": {
-        const tokenRes = await oauthController.token(body);
-        return json(tokenRes);
+      } catch (err: any) {
+        console.error("saml callback error:", err);
+        const { message, statusCode = 500 } = err;
+        // set error in cookie redirect to error page
+        session.flash(JACKSON_ERROR_COOKIE_KEY, { message, statusCode });
+        return redirect("/error", {
+          headers: { "Set-Cookie": await commitSession(session) },
+        });
       }
     }
-  } catch (error: any) {
-    const { message, statusCode = 500 } = error;
-    throw new Response(message, { status: statusCode });
+    case "token": {
+      try {
+        const tokenRes = await oauthController.token(body);
+        return json(tokenRes);
+      } catch (error: any) {
+        const { message, statusCode = 500 } = error;
+        throw new Response(message, { status: statusCode });
+      }
+    }
   }
 };

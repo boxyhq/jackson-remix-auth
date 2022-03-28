@@ -13,6 +13,7 @@ const sessionStorage = createCookieSessionStorage({
 });
 
 const { getSession, commitSession, destroySession } = sessionStorage;
+const JACKSON_ERROR_COOKIE_KEY = "jackson_error";
 
 export default sessionStorage;
-export { getSession, commitSession, destroySession };
+export { getSession, commitSession, destroySession, JACKSON_ERROR_COOKIE_KEY };
