@@ -13,35 +13,55 @@ invariant(
 );
 
 const BASE_URL = process.env.BASE_URL;
+const BOXYHQSAML_ISSUER = process.env.BOXYHQSAML_ISSUER;
 
-export const auth = new Authenticator<BoxyHQSAMLProfile>(sessionStorage);
+let auth: Authenticator;
+declare global {
+  var __auth: Authenticator | undefined;
+}
 
-// This strategy points to a hosted jackson instance
-auth.use(
-  new BoxyHQSAMLStrategy(
-    {
-      issuer: "https://jackson-demo.boxyhq.com",
-      clientID: "dummy",
-      clientSecret: "dummy",
-      callbackURL: new URL("/auth/saml/callback", BASE_URL).toString(),
-    },
-    async ({ profile }) => {
-      return profile;
-    }
-  )
-);
-// This strategy points to the same remix app host (resource routes are setup to handle SAML flow)
-auth.use(
-  new BoxyHQSAMLStrategy(
-    {
-      issuer: process.env.BOXYHQSAML_ISSUER, //same as the APP URL
-      clientID: "dummy",
-      clientSecret: "dummy",
-      callbackURL: new URL("/auth/saml/embed/callback", BASE_URL).toString(),
-    },
-    async ({ profile }) => {
-      return profile;
-    }
-  ),
-  "boxyhq-saml-embed"
-);
+function createAuthenticator() {
+  const auth = new Authenticator<BoxyHQSAMLProfile>(sessionStorage);
+
+  // This strategy points to a hosted jackson instance
+  auth.use(
+    new BoxyHQSAMLStrategy(
+      {
+        issuer: "https://jackson-demo.boxyhq.com",
+        clientID: "dummy",
+        clientSecret: process.env.CLIENT_SECRET_VERIFIER || "dummy",
+        callbackURL: new URL("/auth/saml/callback", BASE_URL).toString(),
+      },
+      async ({ profile }) => {
+        return profile;
+      }
+    )
+  );
+  // This strategy points to the same remix app host (resource routes are setup to handle SAML flow)
+  auth.use(
+    new BoxyHQSAMLStrategy(
+      {
+        issuer: BOXYHQSAML_ISSUER, //same as the APP URL
+        clientID: "dummy",
+        clientSecret: process.env.CLIENT_SECRET_VERIFIER || "dummy",
+        callbackURL: new URL("/auth/saml/embed/callback", BASE_URL).toString(),
+      },
+      async ({ profile }) => {
+        return profile;
+      }
+    ),
+    "boxyhq-saml-embed"
+  );
+  return auth;
+}
+
+if (process.env.NODE_ENV === "production") {
+  auth = createAuthenticator();
+} else {
+  if (!global.__auth) {
+    global.__auth = createAuthenticator();
+  }
+  auth = global.__auth;
+}
+
+export { auth };
