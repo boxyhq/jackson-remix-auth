@@ -59,7 +59,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         console.error("authorize error:", err);
         const { message, statusCode = 500 } = err;
         // set error in cookie redirect to error page
-        session.flash(JACKSON_ERROR_COOKIE_KEY, { message, statusCode });
+        session.set(JACKSON_ERROR_COOKIE_KEY, { message, statusCode });
         return redirect("/error", {
           headers: { "Set-Cookie": await commitSession(session) },
         });
@@ -131,7 +131,7 @@ export const action: ActionFunction = async ({ params, request }) => {
         console.error("saml callback error:", err);
         const { message, statusCode = 500 } = err;
         // set error in cookie redirect to error page
-        session.flash(JACKSON_ERROR_COOKIE_KEY, { message, statusCode });
+        session.set(JACKSON_ERROR_COOKIE_KEY, { message, statusCode });
         return redirect("/error", {
           headers: { "Set-Cookie": await commitSession(session) },
         });

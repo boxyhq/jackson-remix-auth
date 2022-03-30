@@ -16,15 +16,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     statusCode: null,
     message: "",
   };
-  return json(
-    { statusCode, message },
-    {
-      headers: {
-        // only necessary with cookieSessionStorage
-        "Set-Cookie": await commitSession(session),
-      },
-    }
-  );
+  return json({ statusCode, message });
 };
 
 export default function Error() {
