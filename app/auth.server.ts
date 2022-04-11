@@ -29,7 +29,7 @@ function createAuthenticator() {
       {
         issuer: "https://jackson-demo.boxyhq.com",
         clientID: "dummy",
-        clientSecret: process.env.CLIENT_SECRET_VERIFIER || "dummy",
+        clientSecret: "dummy",
         callbackURL: new URL("/auth/saml/callback", BASE_URL).toString(),
       },
       async ({ profile }) => {
