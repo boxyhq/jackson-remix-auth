@@ -27,7 +27,7 @@ function createAuthenticator() {
   auth.use(
     new BoxyHQSAMLStrategy(
       {
-        issuer: "https://jackson-demo.boxyhq.com",
+        issuer: BOXYHQSAML_ISSUER, // Set BOXYHQSAML_ISSUER in env to "https://jackson-demo.boxyhq.com",
         clientID: "dummy",
         clientSecret: "dummy",
         callbackURL: new URL("/auth/saml/callback", BASE_URL).toString(),
