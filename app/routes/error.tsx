@@ -1,9 +1,7 @@
-import { json, LoaderFunction, useLoaderData } from "remix";
-import {
-  commitSession,
-  getSession,
-  JACKSON_ERROR_COOKIE_KEY,
-} from "~/sessions.server";
+import { useLoaderData } from "@remix-run/react";
+import type { LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { getSession, JACKSON_ERROR_COOKIE_KEY } from "~/sessions.server";
 
 type LoaderData = {
   statusCode: null | number;

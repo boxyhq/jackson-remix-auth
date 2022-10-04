@@ -2,8 +2,8 @@
 // host app. Any error for the browser flow (/authorize or /saml) can be set as a flash message and redirected to an error page for jackson
 // Other errors(/userinfo and /token) can be thrown and should be caught by the host app CatchBoundary
 import type { OAuthReq } from "@boxyhq/saml-jackson";
-import type { ActionFunction, LoaderFunction } from "remix";
-import { json, redirect } from "remix";
+import type { LoaderFunction, ActionFunction } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import JacksonProvider, {
   extractAuthTokenFromHeader,

@@ -1,4 +1,6 @@
-import { Form, json, LoaderFunction, useLoaderData } from "remix";
+import { Form, useLoaderData } from "@remix-run/react";
+import type { LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { auth } from "~/auth.server";
 import { commitSession, getSession } from "~/sessions.server";
 
@@ -11,7 +13,7 @@ type LoaderData = {
   };
   fields?: {
     email: string;
-    product: undefined;
+    product: string;
   };
 };
 

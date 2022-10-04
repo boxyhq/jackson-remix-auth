@@ -1,14 +1,15 @@
-import type { LoaderFunction } from "remix";
-import { json, useLoaderData } from "remix";
+import type { LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import { auth } from "~/auth.server";
 import { type BoxyHQSAMLProfile } from "@boxyhq/remix-auth-saml";
 
 type LoaderData = { profile: BoxyHQSAMLProfile };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const profile = await auth.isAuthenticated(request, {
+  const profile = (await auth.isAuthenticated(request, {
     failureRedirect: "/login",
-  });
+  })) as BoxyHQSAMLProfile;
 
   return json<LoaderData>({ profile });
 };

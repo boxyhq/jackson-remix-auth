@@ -1,22 +1,21 @@
+import styles from "./styles/app.css";
+import type { MetaFunction, LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import Navbar from "./components/Navbar";
+import Container from "./components/Container";
+import { auth } from "./auth.server";
+import type { ThrownResponse } from "@remix-run/react";
 import {
-  json,
   Links,
   LiveReload,
-  type LoaderFunction,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-  type ThrownResponse,
   useCatch,
   useLoaderData,
   useLocation,
-} from "remix";
-import styles from "./styles/app.css";
-import type { MetaFunction } from "remix";
-import Navbar from "./components/Navbar";
-import Container from "./components/Container";
-import { auth } from "./auth.server";
+} from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return { title: "Remix SAML Login Example" };

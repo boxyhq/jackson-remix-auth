@@ -1,5 +1,5 @@
-import type { ActionFunction, LoaderFunction } from "remix";
-import { json } from "remix";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import type { GetConfigQuery } from "~/auth.jackson.server";
 import JacksonProvider, {
   extractAuthTokenFromHeader,
