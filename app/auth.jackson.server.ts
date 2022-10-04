@@ -1,17 +1,19 @@
 import jackson from "@boxyhq/saml-jackson";
 import type {
   OAuthReqBody,
+  GetConfigQuery,
   JacksonOption,
   DatabaseOption,
-  IAPIController,
+  IConnectionAPIController,
   IOAuthController,
 } from "@boxyhq/saml-jackson";
 import invariant from "tiny-invariant";
 
 // 📄 https://boxyhq.com/docs/jackson/deploy/env-variables
 const opts: JacksonOption = {
-  externalUrl: "", // APP BASE URL
+  externalUrl: "",
   samlPath: "/api/oauth/saml",
+  oidcPath: "/api/oauth/oidc",
   samlAudience: "",
   db: {
     engine: "sql",
@@ -19,13 +21,20 @@ const opts: JacksonOption = {
     type: "postgres",
   } as DatabaseOption,
   clientSecretVerifier: process.env.CLIENT_SECRET_VERIFIER,
+  openid: {
+    jwsAlg: "RS256",
+    jwtSigningKeys: {
+      private: process.env.OPENID_RSA_PRIVATE_KEY!,
+      public: process.env.OPENID_RSA_PUBLIC_KEY!,
+    },
+  },
 };
 
-let apiController: IAPIController;
+let connectionAPIController: IConnectionAPIController;
 let oauthController: IOAuthController;
 
 declare global {
-  var __apiController: IAPIController;
+  var __connectionAPIController: IConnectionAPIController;
   var __oauthController: IOAuthController;
 }
 
@@ -34,7 +43,7 @@ async function JacksonProvider({
 }: {
   appBaseUrl: string;
 }): Promise<{
-  apiController: IAPIController;
+  connectionAPIController: IConnectionAPIController;
   oauthController: IOAuthController;
 }> {
   const _opts = { ...opts, externalUrl: appBaseUrl, samlAudience: appBaseUrl };
@@ -43,19 +52,19 @@ async function JacksonProvider({
   // create a new connection to the DB with every change either.
   if (process.env.NODE_ENV === "production") {
     const controllers = await jackson(_opts);
-    apiController = controllers.apiController;
+    connectionAPIController = controllers.connectionAPIController;
     oauthController = controllers.oauthController;
   } else {
-    if (!global.__apiController && !global.__oauthController) {
+    if (!global.__connectionAPIController && !global.__oauthController) {
       const controllers = await jackson(_opts);
-      global.__apiController = controllers.apiController;
+      global.__connectionAPIController = controllers.connectionAPIController;
       global.__oauthController = controllers.oauthController;
     }
-    apiController = global.__apiController;
+    connectionAPIController = global.__connectionAPIController;
     oauthController = global.__oauthController;
   }
 
-  return { apiController, oauthController };
+  return { connectionAPIController, oauthController };
 }
 
 const extractAuthTokenFromHeader = (request: Request) => {
@@ -80,4 +89,9 @@ const validateApiKey = (key: string) => {
 };
 
 export default JacksonProvider;
-export { extractAuthTokenFromHeader, validateApiKey, type OAuthReqBody };
+export {
+  extractAuthTokenFromHeader,
+  validateApiKey,
+  type OAuthReqBody,
+  type GetConfigQuery,
+};
