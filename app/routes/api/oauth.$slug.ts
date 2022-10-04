@@ -1,11 +1,12 @@
 // NOTE: This is purely a resource route, eventhough some part of it like the /authorize happens in the browser, it's not part of the
 // host app. Any error for the browser flow (/authorize or /saml) can be set as a flash message and redirected to an error page for jackson
 // Other errors(/userinfo and /token) can be thrown and should be caught by the host app CatchBoundary
-import { ActionFunction, json, LoaderFunction, redirect } from "remix";
+import type { OAuthReq } from "@boxyhq/saml-jackson";
+import type { ActionFunction, LoaderFunction } from "remix";
+import { json, redirect } from "remix";
 import invariant from "tiny-invariant";
 import JacksonProvider, {
   extractAuthTokenFromHeader,
-  type OAuthReqBody,
 } from "~/auth.jackson.server";
 import {
   commitSession,
@@ -40,9 +41,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     case "authorize": {
       try {
         const { redirect_url, authorize_form } =
-          await oauthController.authorize(
-            queryParams as unknown as OAuthReqBody
-          );
+          await oauthController.authorize(queryParams as unknown as OAuthReq);
         if (redirect_url) {
           //  Redirect binding
           return redirect(redirect_url, 302);
@@ -125,8 +124,16 @@ export const action: ActionFunction = async ({ params, request }) => {
   switch (operation) {
     case "saml": {
       try {
-        const { redirect_url } = await oauthController.samlResponse(body);
-        return redirect(redirect_url, 302);
+        const { redirect_url, app_select_form } =
+          await oauthController.samlResponse(body);
+
+        if (redirect_url) {
+          return redirect(redirect_url, 302);
+        } else {
+          return new Response(app_select_form, {
+            headers: { "Content-Type": "text/html; charset=utf-8" },
+          });
+        }
       } catch (err: any) {
         console.error("saml callback error:", err);
         const { message, statusCode = 500 } = err;
