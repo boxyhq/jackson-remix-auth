@@ -1,4 +1,6 @@
-import { ActionFunction, json, LoaderFunction } from "remix";
+import type { ActionFunction, LoaderFunction } from "remix";
+import { json } from "remix";
+import type { GetConfigQuery } from "~/auth.jackson.server";
 import JacksonProvider, {
   extractAuthTokenFromHeader,
   validateApiKey,
@@ -8,7 +10,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
   const queryParams = Object.fromEntries(
     url.searchParams.entries()
-  ) as unknown as { clientID?: string; tenant?: string; product?: string };
+  ) as unknown as GetConfigQuery;
 
   // Validate apiKey
   const apiKey = extractAuthTokenFromHeader(request);
@@ -16,10 +18,12 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw new Response("Unauthorized", { status: 401 });
   }
 
-  const { apiController } = await JacksonProvider({ appBaseUrl: url.origin });
+  const { connectionAPIController } = await JacksonProvider({
+    appBaseUrl: url.origin,
+  });
 
   try {
-    return json(await apiController.getConfig(queryParams));
+    return json(await connectionAPIController.getConnections(queryParams));
   } catch (error: any) {
     const { message, statusCode = 500 } = error;
     throw new Response(message, { status: statusCode });
@@ -43,17 +47,19 @@ export const action: ActionFunction = async ({ request }) => {
     throw new Response("Unauthorized", { status: 401 });
   }
 
-  const { apiController } = await JacksonProvider({ appBaseUrl: url.origin });
+  const { connectionAPIController } = await JacksonProvider({
+    appBaseUrl: url.origin,
+  });
 
   try {
     switch (request.method) {
       case "POST":
-        return json(await apiController.config(body));
+        return json(await connectionAPIController.createSAMLConnection(body));
       case "PATCH":
-        await apiController.updateConfig(body);
+        await connectionAPIController.updateSAMLConnection(body);
         return new Response(null, { status: 204 });
       case "DELETE":
-        await apiController.deleteConfig(body);
+        await connectionAPIController.deleteConnections(body);
         return new Response(null, { status: 204 });
     }
   } catch (error: any) {
