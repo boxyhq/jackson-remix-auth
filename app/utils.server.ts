@@ -1,3 +1,8 @@
+import type {
+  SAMLSSOConnection,
+  OIDCSSOConnection,
+} from "@boxyhq/saml-jackson";
+
 export function validateEmail(email: string) {
   if (
     Array.isArray(
@@ -18,3 +23,11 @@ export function validateProduct(product: string) {
     return "Not a valid product";
   }
 }
+
+export const strategyChecker = (
+  body: SAMLSSOConnection | OIDCSSOConnection
+): { isSAML: boolean; isOIDC: boolean } => {
+  const isSAML = "rawMetadata" in body || "encodedRawMetadata" in body;
+  const isOIDC = "oidcDiscoveryUrl" in body;
+  return { isSAML, isOIDC };
+};
