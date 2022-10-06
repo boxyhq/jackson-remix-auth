@@ -1,23 +1,24 @@
 # Remix Demo App with SAML Auth
 
-This demo shows how to use [BoxyHQSAMLStrategy](https://www.npmjs.com/package/@boxyhq/remix-auth-saml) to integrate SAML login into any remix application.
-Two different SAML Service Provider setups are shown in this demo
+This demo shows how to use [BoxyHQSSOStrategy](https://www.npmjs.com/package/@boxyhq/remix-auth-sso) to integrate Single Sign-On (SSO) into any remix application.
 
-1. With a [hosted](#boxyhq-saml-service-provider) SAML Service Provider
-2. With the SAML Service Provider functionality [embedded](#embed-saml-service-provider) within the remix app using resource routes.
+Two different SSO Service Provider setups are shown in this demo
 
-## Hosted SAML Service Provider
+1. With a [hosted](#hosted-sso-service-provider) SSO Service Provider.
+2. With the SAML Service Provider functionality [embedded](#embedded-sso-service-provider) within the remix app using resource routes.
 
-This uses a [hosted demo instance](https://jackson-demo.boxyhq.com) of [jackson](https://github.com/boxyhq/jackson) as the SAML Service Provider. Tenant and product config is already set up for [Mock SAML Provider](https://mocksaml.com).
+## Hosted SSO Service Provider
 
-## Embedded SAML Service Provider
+This uses a [hosted demo instance](https://jackson-demo.boxyhq.com) of [jackson](https://github.com/boxyhq/jackson) as the SSO Service Provider. Tenant and product config is already set up for [Mock SAML Provider](https://mocksaml.com).
 
-This uses the [jackson npm package](https://www.npmjs.com/package/@boxyhq/saml-jackson) which provides all the bare bones of SAML. See `JacksonProvider` in [auth.jackson.server.ts](app/auth.jackson.server.ts#L32) where the SAML controllers `{ connectionAPIController, oauthController }` are exposed. The resource routes for SAML flow are added in [app/routes/api](app/routes/api). You'll also need to [setup](app/auth.jackson.server.ts#L18) a database for this. More info on the SAML SP options at https://boxyhq.com/docs/jackson/deploy/env-variables.
+## Embedded SSO Service Provider
+
+This uses the [jackson npm package](https://www.npmjs.com/package/@boxyhq/saml-jackson) which provides all the bare bones of SAML. See `JacksonProvider` in [auth.jackson.server.ts](app/auth.jackson.server.ts#L42) where the SSO controllers `{ connectionAPIController, oauthController }` are exposed. The resource routes for SSO flow are added in [app/routes/api](app/routes/api). You'll also need to [setup](app/auth.jackson.server.ts#L18) a database for this. More info on the SAML SP options at https://boxyhq.com/docs/jackson/deploy/env-variables.
 
 Once the app is running [configure](https://boxyhq.com/docs/jackson/sso-flow/#21-add-connection) a SAML IdP as shown below
 
 <details>
-<summary>Below adds a SAML IdP config for https://mocksaml.com</summary>
+<summary>Below adds a SAML IdP connection for https://mocksaml.com</summary>
 <pre>
 curl --location --request POST 'http://localhost:3366/api/v1/connections' \
 --header 'Authorization: Api-Key <API Key>' \
@@ -36,10 +37,10 @@ curl --location --request POST 'http://localhost:3366/api/v1/connections' \
 
 1. `/` - Renders protected content if user is logged in.
 
-2. `/login` - Renders a form (action - `/auth/saml`) with input box which can take in a email that can be used to [switch](app/routes/auth.saml.tsx#L34) SAML tenant dynamically.
+2. `/login` - Renders a form (action - `/auth/sso`) with an input box which can take in an email that can be used to [switch](app/routes/auth.sso.tsx#L35) tenant dynamically.
 3. `/logout`
-4. `/auth/saml` (hosted),`/auth/saml/embed`(embedded) - Action handlers for login initiating the OAuth 2.0 flow to the SAML IdP.
-5. `/auth/saml/callback` (hosted),`/auth/saml/embed/callback` (embedded) - SAML Service Provider (Jackson) after parsing the SAML response from IdP redirects back here with the authorization code. The SAML strategy uses the code to obtain the token and further the user profile and finally redirects back to successRedirect path.
+4. `/auth/sso` (hosted),`/auth/sso/embed`(embedded) - Action handlers for login initiating the OAuth 2.0 flow to the IdP.
+5. `/auth/sso/callback` (hosted),`/auth/sso/embed/callback` (embedded) - SSO Service Provider (Jackson) after parsing the SAML/OIDC response from IdP redirects back here with the authorization code. The SSO strategy uses the code to obtain the token and further the user profile and finally redirects back to `successRedirect` path.
 
 ## Strategy Usage
 
@@ -48,11 +49,11 @@ curl --location --request POST 'http://localhost:3366/api/v1/connections' \
 ```ts
 // BASE_URL should be the hosting url of the app
 // clientID and Secret set to 'dummy' here; they will be populated dynamically from the client side (could be DNS based or an email input)
-export const auth = new Authenticator<BoxyHQSAMLProfile>(sessionStorage);
+export const auth = new Authenticator<BoxyHQSSOProfile>(sessionStorage);
 
 // This strategy points to a hosted jackson instance
 auth.use(
-  new BoxyHQSAMLStrategy(
+  new BoxyHQSSOStrategy(
     {
       issuer: "https://jackson-demo.boxyhq.com",
       clientID: "dummy",
@@ -66,7 +67,7 @@ auth.use(
 );
 // This strategy points to the same remix app host (resource routes are setup to handle SAML flow)
 auth.use(
-  new BoxyHQSAMLStrategy(
+  new BoxyHQSSOStrategy(
     {
       issuer: process.env.BOXYHQSAML_ISSUER, //same as the APP URL
       clientID: "dummy",
