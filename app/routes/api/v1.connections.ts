@@ -5,6 +5,7 @@ import JacksonProvider, {
   extractAuthTokenFromHeader,
   validateApiKey,
 } from "~/auth.jackson.server";
+import { strategyChecker } from "~/utils.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
@@ -53,11 +54,27 @@ export const action: ActionFunction = async ({ request }) => {
 
   try {
     switch (request.method) {
-      case "POST":
-        return json(await connectionAPIController.createSAMLConnection(body));
-      case "PATCH":
-        await connectionAPIController.updateSAMLConnection(body);
+      case "POST": {
+        const { isSAML, isOIDC } = strategyChecker(body);
+        if (isSAML) {
+          return json(await connectionAPIController.createSAMLConnection(body));
+        } else if (isOIDC) {
+          return json(await connectionAPIController.createOIDCConnection(body));
+        } else {
+          throw { message: "Missing SSO connection params", statusCode: 400 };
+        }
+      }
+      case "PATCH": {
+        const { isSAML, isOIDC } = strategyChecker(body);
+        if (isSAML) {
+          await connectionAPIController.updateSAMLConnection(body);
+        } else if (isOIDC) {
+          await connectionAPIController.updateOIDCConnection(body);
+        } else {
+          throw { message: "Missing SSO connection params", statusCode: 400 };
+        }
         return new Response(null, { status: 204 });
+      }
       case "DELETE":
         await connectionAPIController.deleteConnections(body);
         return new Response(null, { status: 204 });
