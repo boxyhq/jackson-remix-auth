@@ -19,6 +19,7 @@ const opts: JacksonOption = {
     engine: "sql",
     url: "postgresql://postgres:postgres@localhost:5432/postgres",
     type: "postgres",
+    encryptionKey: process.env.DB_ENCRYPTION_KEY,
   } as DatabaseOption,
   clientSecretVerifier: process.env.CLIENT_SECRET_VERIFIER,
   openid: {
