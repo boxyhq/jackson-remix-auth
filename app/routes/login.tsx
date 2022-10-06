@@ -38,8 +38,8 @@ export default function Login() {
     <div className="mx-auto flex max-w-md flex-col py-20">
       <h2 className="mt-5 text-center text-3xl">Log in to App</h2>
       <p className="mt-4 text-center font-medium text-gray-500">
-        Click `Continue with SAML SSO` and you will be redirected to your
-        third-party authentication provider to finish authenticating.
+        Click `Continue with SSO` and you will be redirected to your third-party
+        authentication provider to finish authenticating.
       </p>
       {error ? <div role="alert">{error.message}</div> : null}
       {formError ? <div role="alert">{formError}</div> : null}
@@ -47,7 +47,7 @@ export default function Login() {
         <div className="rounded bg-white py-6 px-6">
           <Form
             method="post"
-            action="/auth/saml"
+            action="/auth/sso"
             className="flex flex-col items-start space-y-4"
             reloadDocument
           >
@@ -90,14 +90,14 @@ export default function Login() {
               type="submit"
               className="w-full rounded border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white focus:outline-none"
             >
-              Continue with SAML SSO (Hosted SAML Provider)
+              Continue with SSO (Hosted Jackson)
             </button>
             <button
               type="submit"
-              formAction="/auth/saml/embed"
+              formAction="/auth/sso/embed"
               className="w-full rounded border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white focus:outline-none"
             >
-              Continue with SAML SSO (Embedded SAML Provider)
+              Continue with SSO (Embedded Jackson)
             </button>
           </Form>
         </div>
