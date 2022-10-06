@@ -1,7 +1,7 @@
 // NOTE: This is purely a resource route, eventhough some part of it like the /authorize happens in the browser, it's not part of the
 // host app. Any error for the browser flow (/authorize or /saml) can be set as a flash message and redirected to an error page for jackson
 // Other errors(/userinfo and /token) can be thrown and should be caught by the host app CatchBoundary
-import type { OAuthReq } from "@boxyhq/saml-jackson";
+import type { OAuthReq, OIDCAuthzResponsePayload } from "@boxyhq/saml-jackson";
 import type { LoaderFunction, ActionFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
@@ -21,7 +21,11 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   // maybe you change the name of the file to oauth.$somethingElse.ts, below invariant validates that the params is defined
   invariant(params.slug, "expected params.slug");
   const operation = params.slug;
-  if (operation !== "authorize" && operation !== "userinfo") {
+  if (
+    operation !== "authorize" &&
+    operation !== "oidc" &&
+    operation !== "userinfo"
+  ) {
     // Will be caught in CatchBoundary defined in root.tsx
     throw new Response("Not Found", {
       status: 404,
@@ -64,6 +68,24 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         });
       }
     }
+    case "oidc": {
+      try {
+        const { redirect_url } = await oauthController.oidcAuthzResponse(
+          queryParams as unknown as OIDCAuthzResponsePayload
+        );
+        if (redirect_url) {
+          redirect(redirect_url, 302);
+        }
+      } catch (err: any) {
+        console.error("oidc callback error:", err);
+        const { message, statusCode = 500 } = err;
+        // set error in cookie redirect to error page
+        session.set(JACKSON_ERROR_COOKIE_KEY, { message, statusCode });
+        return redirect("/error", {
+          headers: { "Set-Cookie": await commitSession(session) },
+        });
+      }
+    }
     case "userinfo": {
       let token: string | null = extractAuthTokenFromHeader(request);
 
@@ -88,7 +110,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   }
 };
 
-// Handles POST /api/oauth/saml, POST /api/oauth/token
+// Handles POST /api/oauth/saml, /api/oauth/oidc, POST /api/oauth/token
 export const action: ActionFunction = async ({ params, request }) => {
   const session = await getSession(request.headers.get("Cookie"));
 
