@@ -1,7 +1,7 @@
 {
-  "name": "remix-demoapp-with-samlauth",
+  "name": "jackson-remix-auth",
   "private": true,
-  "description": "",
+  "description": "A remix demo app showing SSO with jackson",
   "license": "MIT",
   "sideEffects": false,
   "scripts": {
