@@ -5,20 +5,25 @@ This demo shows how to use [BoxyHQSSOStrategy](https://www.npmjs.com/package/@bo
 Two different SSO Service Provider setups are shown in this demo
 
 1. With a [hosted](#hosted-sso-service-provider) SSO Service Provider.
-2. With the SAML Service Provider functionality [embedded](#embedded-sso-service-provider) within the remix app using resource routes.
+2. With the SSO Service Provider functionality [embedded](#embedded-sso-service-provider) within the remix app using resource routes.
 
 ## Hosted SSO Service Provider
 
 This uses a [hosted demo instance](https://jackson-demo.boxyhq.com) of [jackson](https://github.com/boxyhq/jackson) as the SSO Service Provider. Tenant and product config is already set up for [Mock SAML Provider](https://mocksaml.com).
 
+To test out this flow, setup env with `BOXYHQSSO_ISSUER` as below:
+BOXYHQSSO_ISSUER=https://jackson-demo.boxyhq.com
+
+The tenant and product are locked into `boxyhq.com`(app/routes/login.tsx#L60) and [`saml-demo.boxyhq.com`](app/routes/login.tsx#L78) for which the connection is pre-configured at https://jackson-demo.boxyhq.com.
+
 ## Embedded SSO Service Provider
 
-This uses the [jackson npm package](https://www.npmjs.com/package/@boxyhq/saml-jackson) which provides all the bare bones of SAML. See `JacksonProvider` in [auth.jackson.server.ts](app/auth.jackson.server.ts#L42) where the SSO controllers `{ connectionAPIController, oauthController }` are exposed. The resource routes for SSO flow are added in [app/routes/api](app/routes/api). You'll also need to [setup](app/auth.jackson.server.ts#L18) a database for this. More info on the SAML SP options at https://boxyhq.com/docs/jackson/deploy/env-variables.
+This uses the [jackson npm package](https://www.npmjs.com/package/@boxyhq/saml-jackson) to embed the Single Sign-On feature without depending on an external service. See `JacksonProvider` in [auth.jackson.server.ts](app/auth.jackson.server.ts#L42) where the SSO controllers `{ connectionAPIController, oauthController }` are exposed. The resource routes for SSO flow are added in [app/routes/api](app/routes/api/). You'll also need to [setup](app/auth.jackson.server.ts#L18) a database for this. To see the entire list of configuration options go to https://boxyhq.com/docs/jackson/deploy/env-variables.
 
-Once the app is running [configure](https://boxyhq.com/docs/jackson/sso-flow/#21-add-connection) a SAML IdP as shown below
+Once the app is running [configure](https://boxyhq.com/docs/jackson/sso-flow/#21-add-connection) an SSO Connection as shown below. Here we are going with a SAML SSO Connection.
 
 <details>
-<summary>Below adds a SAML IdP connection for https://mocksaml.com</summary>
+<summary>Below adds a SAML SSO connection for https://mocksaml.com</summary>
 <pre>
 curl --location --request POST 'http://localhost:3366/api/v1/connections' \
 --header 'Authorization: Api-Key <API Key>' \
@@ -48,14 +53,14 @@ curl --location --request POST 'http://localhost:3366/api/v1/connections' \
 
 ```ts
 // BASE_URL should be the hosting url of the app
-// clientID and Secret set to 'dummy' here; they will be populated dynamically from the client side (could be DNS based or an email input)
+// clientID and Secret set to 'dummy' here; they will be populated dynamically from the client side. The clientID is passed as a URL encoded string containing the tenant and product
 export const auth = new Authenticator<BoxyHQSSOProfile>(sessionStorage);
 
 // This strategy points to a hosted jackson instance
 auth.use(
   new BoxyHQSSOStrategy(
     {
-      issuer: "https://jackson-demo.boxyhq.com",
+      issuer: process.env.BOXYHQSAML_ISSUER // "https://jackson-demo.boxyhq.com",
       clientID: "dummy",
       clientSecret: "dummy",
       callbackURL: new URL("/auth/saml/callback", BASE_URL).toString(),
@@ -71,7 +76,7 @@ auth.use(
     {
       issuer: process.env.BOXYHQSAML_ISSUER, //same as the APP URL
       clientID: "dummy",
-      clientSecret: "dummy",
+      clientSecret: process.env.CLIENT_SECRET_VERIFIER, // this env will be used to perform authentication at token endpoint
       callbackURL: new URL("/auth/saml/embed/callback", BASE_URL).toString(),
     },
     async ({ profile }) => {
@@ -84,6 +89,6 @@ auth.use(
 
 ## FAQ
 
-1. How is tenant/product passed from client side ?
+How is the tenant/product passed from the client side?
 
-   [Login](app/routes/login.tsx) has an email input which could be used to discover tenant from the domain. This is one of several ways which can include using the DNS subdomain, or a dropdown. The demo is using the `boxyhq.com` and `saml-demo.boxyhq.com` which is already setup in the demo jackson SAML Service Provider (https://jackson-demo.boxyhq.com)
+In the login form action handlers [app/routes/auth.sso.tsx](app/routes/auth.sso.tsx#L41), [app/routes/auth.sso.embed.tsx](app/routes/auth.sso.embed.tsx#L41), clientID is passed in the context param to authorize endpoint.
