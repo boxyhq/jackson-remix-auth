@@ -74,7 +74,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           queryParams as unknown as OIDCAuthzResponsePayload
         );
         if (redirect_url) {
-          redirect(redirect_url, 302);
+          return redirect(redirect_url, 302);
         }
       } catch (err: any) {
         console.error("oidc callback error:", err);
