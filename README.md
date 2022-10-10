@@ -92,3 +92,7 @@ auth.use(
 How is the tenant/product passed from the client side?
 
 In the login form action handlers [app/routes/auth.sso.tsx](app/routes/auth.sso.tsx#L41), [app/routes/auth.sso.embed.tsx](app/routes/auth.sso.embed.tsx#L41), clientID is passed in the context param to authorize endpoint.
+
+How can I test with a different "tenant/product"?
+
+The demo uses email to detect the tenant. You can use an alternate mechanism such as directly asking for tenant information from the user. The same applies to "product". You might have to whitelist the product in [`validateProduct`](app/utils.server.ts#L20).
