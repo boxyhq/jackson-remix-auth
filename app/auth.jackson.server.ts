@@ -16,9 +16,9 @@ const opts: JacksonOption = {
   oidcPath: "/api/oauth/oidc",
   samlAudience: "",
   db: {
-    engine: "sql",
-    url: "postgresql://postgres:postgres@localhost:5432/postgres",
-    type: "postgres",
+    engine: process.env.DB_ENGINE,
+    url: process.env.DB_URL,
+    type: process.env.DB_TYPE,
     encryptionKey: process.env.DB_ENCRYPTION_KEY,
   } as DatabaseOption,
   clientSecretVerifier: process.env.CLIENT_SECRET_VERIFIER,
