@@ -82,7 +82,7 @@ export const auth = new Authenticator<BoxyHQSSOProfile>(sessionStorage);
 auth.use(
   new BoxyHQSSOStrategy(
     {
-      issuer: process.env.BOXYHQSAML_ISSUER // "https://jackson-demo.boxyhq.com",
+      issuer: process.env.BOXYHQSSO_ISSUER // "https://jackson-demo.boxyhq.com",
       clientID: "dummy",
       clientSecret: "dummy",
       callbackURL: new URL("/auth/saml/callback", BASE_URL).toString(),
@@ -96,7 +96,7 @@ auth.use(
 auth.use(
   new BoxyHQSSOStrategy(
     {
-      issuer: process.env.BOXYHQSAML_ISSUER, //same as the APP URL
+      issuer: process.env.BOXYHQSSO_ISSUER, //same as the APP URL
       clientID: "dummy",
       clientSecret: process.env.CLIENT_SECRET_VERIFIER, // this env will be used to perform authentication at token endpoint
       callbackURL: new URL("/auth/saml/embed/callback", BASE_URL).toString(),
