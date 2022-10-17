@@ -20,7 +20,7 @@ npm i
 Create a `.env` file from `.env.example`
 
 ```
-cp .example.env .env
+cp .env.example .env
 ```
 
 ## Start the app
