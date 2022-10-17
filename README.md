@@ -7,6 +7,28 @@ Two different SSO Service Provider setups are shown in this demo
 1. With a [hosted](#hosted-sso-service-provider) SSO Service Provider.
 2. With the SSO Service Provider functionality [embedded](#embedded-sso-service-provider) within the remix app using resource routes.
 
+## Getting started
+
+## Install dependencies
+
+```
+npm i
+```
+
+## Set up the env
+
+Create a `.env` file from `.env.example`
+
+```
+cp .example.env .env
+```
+
+## Start the app
+
+```
+npm run dev
+```
+
 ## Hosted SSO Service Provider
 
 This uses a [hosted demo instance](https://jackson-demo.boxyhq.com) of [jackson](https://github.com/boxyhq/jackson) as the SSO Service Provider. Tenant and product config is already set up for [Mock SAML Provider](https://mocksaml.com).
