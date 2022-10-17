@@ -1,19 +1,19 @@
 import { Authenticator } from "remix-auth";
 import {
-  BoxyHQSAMLStrategy,
-  type BoxyHQSAMLProfile,
-} from "@boxyhq/remix-auth-saml";
+  BoxyHQSSOStrategy,
+  type BoxyHQSSOProfile,
+} from "@boxyhq/remix-auth-sso";
 import invariant from "tiny-invariant";
 import sessionStorage from "./sessions.server";
 
 invariant(process.env.BASE_URL, "Expected BASE_URL to be set in env");
 invariant(
-  process.env.BOXYHQSAML_ISSUER,
-  "Expected BOXYHQSAML_ISSUER to be set in env"
+  process.env.BOXYHQSSO_ISSUER,
+  "Expected BOXYHQSSO_ISSUER to be set in env"
 );
 
 const BASE_URL = process.env.BASE_URL;
-const BOXYHQSAML_ISSUER = process.env.BOXYHQSAML_ISSUER;
+const BOXYHQSSO_ISSUER = process.env.BOXYHQSSO_ISSUER;
 
 let auth: Authenticator;
 declare global {
@@ -21,36 +21,36 @@ declare global {
 }
 
 function createAuthenticator() {
-  const auth = new Authenticator<BoxyHQSAMLProfile>(sessionStorage);
+  const auth = new Authenticator<BoxyHQSSOProfile>(sessionStorage);
 
   // This strategy points to a hosted jackson instance
   auth.use(
-    new BoxyHQSAMLStrategy(
+    new BoxyHQSSOStrategy(
       {
-        issuer: BOXYHQSAML_ISSUER, // Set BOXYHQSAML_ISSUER in env to "https://jackson-demo.boxyhq.com",
+        issuer: BOXYHQSSO_ISSUER, // Set BOXYHQSSO_ISSUER in env to "https://jackson-demo.boxyhq.com",
         clientID: "dummy",
         clientSecret: "dummy",
-        callbackURL: new URL("/auth/saml/callback", BASE_URL).toString(),
+        callbackURL: new URL("/auth/sso/callback", BASE_URL).toString(),
       },
-      async ({ profile }) => {
+      async ({ profile }: { profile: BoxyHQSSOProfile }) => {
         return profile;
       }
     )
   );
   // This strategy points to the same remix app host (resource routes are setup to handle SAML flow)
   auth.use(
-    new BoxyHQSAMLStrategy(
+    new BoxyHQSSOStrategy(
       {
-        issuer: BOXYHQSAML_ISSUER, //same as the APP URL
+        issuer: BOXYHQSSO_ISSUER, //same as the APP URL
         clientID: "dummy",
         clientSecret: process.env.CLIENT_SECRET_VERIFIER || "dummy",
-        callbackURL: new URL("/auth/saml/embed/callback", BASE_URL).toString(),
+        callbackURL: new URL("/auth/sso/embed/callback", BASE_URL).toString(),
       },
-      async ({ profile }) => {
+      async ({ profile }: { profile: BoxyHQSSOProfile }) => {
         return profile;
       }
     ),
-    "boxyhq-saml-embed"
+    "boxyhq-sso-embed"
   );
   return auth;
 }

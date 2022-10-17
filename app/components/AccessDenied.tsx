@@ -11,7 +11,7 @@ export default function AccessDenied() {
         <Link to="/login" className="link">
           Sign In
         </Link>{" "}
-        begin the SAML login flow using SAML Jackson and NextAuth.js.
+        begin the SSO login flow.
       </p>
     </>
   );

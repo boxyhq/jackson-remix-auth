@@ -1,4 +1,6 @@
-import { json, type LoaderFunction, useCatch, useLoaderData } from "remix";
+import { json } from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/node";
+import { useCatch, useLoaderData } from "@remix-run/react";
 import { auth } from "~/auth.server";
 import AccessDenied from "~/components/AccessDenied";
 

@@ -1,11 +1,12 @@
 // NOTE: This is purely a resource route, eventhough some part of it like the /authorize happens in the browser, it's not part of the
 // host app. Any error for the browser flow (/authorize or /saml) can be set as a flash message and redirected to an error page for jackson
 // Other errors(/userinfo and /token) can be thrown and should be caught by the host app CatchBoundary
-import { ActionFunction, json, LoaderFunction, redirect } from "remix";
+import type { OAuthReq, OIDCAuthzResponsePayload } from "@boxyhq/saml-jackson";
+import type { LoaderFunction, ActionFunction } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import JacksonProvider, {
   extractAuthTokenFromHeader,
-  type OAuthReqBody,
 } from "~/auth.jackson.server";
 import {
   commitSession,
@@ -20,7 +21,11 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   // maybe you change the name of the file to oauth.$somethingElse.ts, below invariant validates that the params is defined
   invariant(params.slug, "expected params.slug");
   const operation = params.slug;
-  if (operation !== "authorize" && operation !== "userinfo") {
+  if (
+    operation !== "authorize" &&
+    operation !== "oidc" &&
+    operation !== "userinfo"
+  ) {
     // Will be caught in CatchBoundary defined in root.tsx
     throw new Response("Not Found", {
       status: 404,
@@ -40,9 +45,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     case "authorize": {
       try {
         const { redirect_url, authorize_form } =
-          await oauthController.authorize(
-            queryParams as unknown as OAuthReqBody
-          );
+          await oauthController.authorize(queryParams as unknown as OAuthReq);
         if (redirect_url) {
           //  Redirect binding
           return redirect(redirect_url, 302);
@@ -57,6 +60,24 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         }
       } catch (err: any) {
         console.error("authorize error:", err);
+        const { message, statusCode = 500 } = err;
+        // set error in cookie redirect to error page
+        session.set(JACKSON_ERROR_COOKIE_KEY, { message, statusCode });
+        return redirect("/error", {
+          headers: { "Set-Cookie": await commitSession(session) },
+        });
+      }
+    }
+    case "oidc": {
+      try {
+        const { redirect_url } = await oauthController.oidcAuthzResponse(
+          queryParams as unknown as OIDCAuthzResponsePayload
+        );
+        if (redirect_url) {
+          return redirect(redirect_url, 302);
+        }
+      } catch (err: any) {
+        console.error("oidc callback error:", err);
         const { message, statusCode = 500 } = err;
         // set error in cookie redirect to error page
         session.set(JACKSON_ERROR_COOKIE_KEY, { message, statusCode });
@@ -89,7 +110,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   }
 };
 
-// Handles POST /api/oauth/saml, POST /api/oauth/token
+// Handles POST /api/oauth/saml, /api/oauth/oidc, POST /api/oauth/token
 export const action: ActionFunction = async ({ params, request }) => {
   const session = await getSession(request.headers.get("Cookie"));
 
@@ -125,8 +146,16 @@ export const action: ActionFunction = async ({ params, request }) => {
   switch (operation) {
     case "saml": {
       try {
-        const { redirect_url } = await oauthController.samlResponse(body);
-        return redirect(redirect_url, 302);
+        const { redirect_url, app_select_form } =
+          await oauthController.samlResponse(body);
+
+        if (redirect_url) {
+          return redirect(redirect_url, 302);
+        } else {
+          return new Response(app_select_form, {
+            headers: { "Content-Type": "text/html; charset=utf-8" },
+          });
+        }
       } catch (err: any) {
         console.error("saml callback error:", err);
         const { message, statusCode = 500 } = err;

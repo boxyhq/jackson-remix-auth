@@ -1,4 +1,5 @@
-import { ActionFunction, redirect } from "remix";
+import type { ActionFunction } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { auth } from "~/auth.server";
 import { commitSession, getSession } from "~/sessions.server";
 import { validateEmail, validateProduct } from "~/utils.server";
@@ -33,7 +34,7 @@ export const action: ActionFunction = async ({ request }) => {
   // extracting the tenant from email is one way to set it
   const tenant = email.split("@")[1];
 
-  return await auth.authenticate("boxyhq-saml-embed", request, {
+  return await auth.authenticate("boxyhq-sso-embed", request, {
     successRedirect: "/private",
     failureRedirect: "/login",
     context: {
