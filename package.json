@@ -10,7 +10,7 @@
     "dev": "concurrently \"npm run dev:css\" \"cross-env NODE_ENV=development PORT=3366 remix dev\"",
     "dev:css": "tailwindcss -w -i ./styles/app.css -o app/styles/app.css",
     "postinstall": "remix setup node",
-    "start": "cross-env NODE_ENV=production PORT=3366 BASE_URL=http://localhost:3366 BOXYHQSAML_ISSUER=http://localhost:3366 COOKIE_SECRETS=\"9q7JoIWjJolTYQn+6dUZ0CoxnaY=\" CLIENT_SECRET_VERIFIER=\"5i3DgQQI0NsnUr7z8IOY0B0e3lw=\" JACKSON_API_KEYS=\"NGwhynnXaUq7DAYwm3099AaOIVM=\" remix-serve build"
+    "start": "cross-env NODE_ENV=production PORT=3366 BASE_URL=http://localhost:3366 BOXYHQSAML_ISSUER=http://localhost:3366 COOKIE_SECRETS=\"<Insert your cookie secret here>\" CLIENT_SECRET_VERIFIER=\"<Insert your client secret verifier here>\" JACKSON_API_KEYS=\"<Insert your keys here>\" remix-serve build"
   },
   "dependencies": {
     "@boxyhq/remix-auth-sso": "1.1.0",
