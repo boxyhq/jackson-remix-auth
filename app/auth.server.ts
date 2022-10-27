@@ -29,7 +29,7 @@ function createAuthenticator() {
       {
         issuer: BOXYHQSSO_ISSUER, // Set BOXYHQSSO_ISSUER in env to "https://jackson-demo.boxyhq.com",
         clientID: "dummy",
-        clientSecret: "dummy",
+        clientSecret: process.env.CLIENT_SECRET_VERIFIER || "dummy",
         callbackURL: new URL("/auth/sso/callback", BASE_URL).toString(),
       },
       async ({ profile }: { profile: BoxyHQSSOProfile }) => {
