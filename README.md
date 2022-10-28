@@ -39,7 +39,7 @@ We have two options when it comes to enabling SSO for a remix app. You can host 
 
 In this setup, you can use a hosted service endpoint for Jackson. See the [deploy](https://boxyhq.com/docs/jackson/deploy/service) guide on how to run Jackson as a service. Once you have the service set up, simply point the env `BOXYHQSSO_ISSUER` to the service URL.
 
-To test out this flow, setup `.env` with `BOXYHQSSO_ISSUER` as below:
+For a quick test, setup `.env` with `BOXYHQSSO_ISSUER` as below:
 
 ```
 BOXYHQSSO_ISSUER=https://jackson-demo.boxyhq.com
