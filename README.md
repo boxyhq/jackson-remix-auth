@@ -1,4 +1,4 @@
-# Remix Demo App with SAML Auth
+# Remix Demo App with Single Sign-On (SSO)
 
 This demo shows how to use [BoxyHQSSOStrategy](https://www.npmjs.com/package/@boxyhq/remix-auth-sso) to integrate Single Sign-On (SSO) into any remix application.
 
