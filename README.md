@@ -23,11 +23,17 @@ Create a `.env` file from `.env.example`
 cp .env.example .env
 ```
 
+**NOTE**: You may have to tweak `.env` based on the type of SSO Provider setup i.e. Hosted vs Embedded. Refer the [SSO Provider Setup](#sso-provider-setup) section below.
+
 ## Start the app
 
 ```
 npm run dev
 ```
+
+## SSO Provider Setup
+
+We have two options when it comes to enabling SSO for a remix app. You can host the SSO feature (i.e. Jackson) as a standalone service or you could embed the SSO functionality inside the remix app with the help of our [npm](https://www.npmjs.com/package/@boxyhq/saml-jackson) package.
 
 ## Hosted SSO Service Provider
 
