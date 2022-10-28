@@ -31,16 +31,43 @@ npm run dev
 
 ## Hosted SSO Service Provider
 
-This uses a [hosted demo instance](https://jackson-demo.boxyhq.com) of [jackson](https://github.com/boxyhq/jackson) as the SSO Service Provider. Tenant and product config is already set up for [Mock SAML Provider](https://mocksaml.com).
+In this setup, you can use a hosted service endpoint for Jackson. See the [deploy](https://boxyhq.com/docs/jackson/deploy/service) guide on how to run Jackson as a service. Once you have the service set up, simply point the env `BOXYHQSSO_ISSUER` to the service URL.
 
-To test out this flow, setup env with `BOXYHQSSO_ISSUER` as below:
+To test out this flow, setup `.env` with `BOXYHQSSO_ISSUER` as below:
+
+```
 BOXYHQSSO_ISSUER=https://jackson-demo.boxyhq.com
+CLIENT_SECRET_VERIFIER=dummy
+```
 
-The tenant and product are locked into `boxyhq.com`(app/routes/login.tsx#L60) and [`saml-demo.boxyhq.com`](app/routes/login.tsx#L78) for which the connection is pre-configured at https://jackson-demo.boxyhq.com.
+This uses a [hosted demo instance](https://jackson-demo.boxyhq.com) of [jackson](https://github.com/boxyhq/jackson) as the SSO Service Provider. An SSO connection is preconfigured pointing to [Mock SAML IdP](https://mocksaml.com).
+
+The tenant and product are locked into [`boxyhq.com`](app/routes/login.tsx#L60) and [`saml-demo.boxyhq.com`](app/routes/login.tsx#L78) for the Mock SAML IdP Connection.
 
 ## Embedded SSO Service Provider
 
-This uses the [jackson npm package](https://www.npmjs.com/package/@boxyhq/saml-jackson) to embed the Single Sign-On feature without depending on an external service. See `JacksonProvider` in [auth.jackson.server.ts](app/auth.jackson.server.ts#L42) where the SSO controllers `{ connectionAPIController, oauthController }` are exposed. The resource routes for SSO flow are added in [app/routes/api](app/routes/api/). You'll also need to [setup](app/auth.jackson.server.ts#L18) a database for this. To see the entire list of configuration options go to https://boxyhq.com/docs/jackson/deploy/env-variables.
+This uses the [jackson npm package](https://www.npmjs.com/package/@boxyhq/saml-jackson) to embed the Single Sign-On feature without depending on an external service. See `JacksonProvider` in [auth.jackson.server.ts](app/auth.jackson.server.ts#L42) where the SSO controllers `{ connectionAPIController, oauthController }` are exposed. The resource routes for SSO flow are added in [app/routes/api](app/routes/api/).
+
+For this setup, we will need some additional env for the following :
+
+```typescript
+  db: {
+    engine: process.env.DB_ENGINE,
+    url: process.env.DB_URL,
+    type: process.env.DB_TYPE,
+    encryptionKey: process.env.DB_ENCRYPTION_KEY,
+  } as DatabaseOption,
+  clientSecretVerifier: process.env.CLIENT_SECRET_VERIFIER,
+  openid: {
+    jwsAlg: "RS256",
+    jwtSigningKeys: {
+      private: process.env.OPENID_RSA_PRIVATE_KEY!,
+      public: process.env.OPENID_RSA_PUBLIC_KEY!,
+    },
+  },
+```
+
+Please refer to https://boxyhq.com/docs/jackson/deploy/env-variables for more info and set the variables in `.env`.
 
 Once the app is running [configure](https://boxyhq.com/docs/jackson/sso-flow/#21-add-connection) an SSO Connection as shown below. Here we are going with a SAML SSO Connection.
 
