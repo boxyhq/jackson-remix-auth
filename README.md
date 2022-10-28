@@ -35,7 +35,7 @@ npm run dev
 
 We have two options when it comes to enabling SSO for a remix app. You can host the SSO feature (i.e. Jackson) as a standalone service or you could embed the SSO functionality inside the remix app with the help of our [npm](https://www.npmjs.com/package/@boxyhq/saml-jackson) package.
 
-## Hosted SSO Service Provider
+### Hosted SSO Service Provider
 
 In this setup, you can use a hosted service endpoint for Jackson. See the [deploy](https://boxyhq.com/docs/jackson/deploy/service) guide on how to run Jackson as a service. Once you have the service set up, simply point the env `BOXYHQSSO_ISSUER` to the service URL.
 
@@ -50,7 +50,7 @@ This uses a [hosted demo instance](https://jackson-demo.boxyhq.com) of [jackson]
 
 The tenant and product are locked into [`boxyhq.com`](app/routes/login.tsx#L60) and [`saml-demo.boxyhq.com`](app/routes/login.tsx#L78) for the Mock SAML IdP Connection.
 
-## Embedded SSO Service Provider
+### Embedded SSO Service Provider
 
 This uses the [jackson npm package](https://www.npmjs.com/package/@boxyhq/saml-jackson) to embed the Single Sign-On feature without depending on an external service. See `JacksonProvider` in [auth.jackson.server.ts](app/auth.jackson.server.ts#L42) where the SSO controllers `{ connectionAPIController, oauthController }` are exposed. The resource routes for SSO flow are added in [app/routes/api](app/routes/api/).
 
