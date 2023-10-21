@@ -75,7 +75,7 @@ export default function Login() {
               type="text"
               name="product"
               hidden
-              defaultValue={fields?.product || "saml-demo.boxyhq.com"}
+              defaultValue={fields?.product || "1eef7782-41d4-4a0a-b450-0857413b4f63"}
             />
             {fieldErrors?.product ? (
               <p
