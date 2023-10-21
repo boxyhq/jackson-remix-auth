@@ -18,7 +18,7 @@ export function validateEmail(email: string) {
 }
 
 export function validateProduct(product: string) {
-  const allowedProducts = ["saml-demo.boxyhq.com"];
+  const allowedProducts = ["saml-demo.boxyhq.com", "1eef7782-41d4-4a0a-b450-0857413b4f63"];
   if (allowedProducts.includes(product) === false) {
     return "Not a valid product";
   }

@@ -42,13 +42,13 @@ In this setup, you can use a hosted service endpoint for Jackson. See the [deplo
 For a quick test, setup `.env` with `BOXYHQSSO_ISSUER` as below:
 
 ```
-BOXYHQSSO_ISSUER=https://jackson-demo.boxyhq.com
+BOXYHQSSO_ISSUER=https://sso.eu.boxyhq.com
 CLIENT_SECRET_VERIFIER=dummy
 ```
 
-This uses a [hosted demo instance](https://jackson-demo.boxyhq.com) of [jackson](https://github.com/boxyhq/jackson) as the SSO Service Provider. An SSO connection is preconfigured pointing to [Mock SAML IdP](https://mocksaml.com).
+This uses a [our SaaS instance](https://sso.eu.boxyhq.com) of [jackson](https://github.com/boxyhq/jackson) as the SSO Service Provider. An SSO connection is preconfigured pointing to [Mock SAML IdP](https://mocksaml.com).
 
-The tenant and product are locked into [`boxyhq.com`](app/routes/login.tsx#L60) and [`saml-demo.boxyhq.com`](app/routes/login.tsx#L78) for the Mock SAML IdP Connection.
+The tenant and product are locked into [`boxyhq.com`](app/routes/login.tsx#L60) and [`1eef7782-41d4-4a0a-b450-0857413b4f63`](app/routes/login.tsx#L78) for the Mock SAML IdP Connection.
 
 ### Embedded SSO Service Provider
 
@@ -115,7 +115,7 @@ export const auth = new Authenticator<BoxyHQSSOProfile>(sessionStorage);
 auth.use(
   new BoxyHQSSOStrategy(
     {
-      issuer: process.env.BOXYHQSSO_ISSUER // "https://jackson-demo.boxyhq.com",
+      issuer: process.env.BOXYHQSSO_ISSUER // "https://sso.eu.boxyhq.com",
       clientID: "dummy",
       clientSecret: "dummy",
       callbackURL: new URL("/auth/saml/callback", BASE_URL).toString(),
